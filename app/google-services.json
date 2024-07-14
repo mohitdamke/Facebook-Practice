@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "37671448657",
+    "project_id": "facebook-practice-5e8ca",
+    "storage_bucket": "facebook-practice-5e8ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:37671448657:android:a49aecefc60c156362c870",
+        "android_client_info": {
+          "package_name": "com.example.facebookpractice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPTyL0_c1Y9SuJC_NTb4rocaWYOME1eBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
