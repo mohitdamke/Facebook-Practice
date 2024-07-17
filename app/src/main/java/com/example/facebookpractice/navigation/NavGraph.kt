@@ -7,8 +7,10 @@ import androidx.navigation.compose.composable
 import com.example.facebookpractice.screens.AddThreads
 import com.example.facebookpractice.screens.BottomNav
 import com.example.facebookpractice.screens.Home
+import com.example.facebookpractice.screens.Login
 import com.example.facebookpractice.screens.Notification
 import com.example.facebookpractice.screens.Profile
+import com.example.facebookpractice.screens.Register
 import com.example.facebookpractice.screens.Search
 import com.example.facebookpractice.screens.Splash
 
@@ -22,6 +24,14 @@ fun NavGraph(navController: NavHostController) {
 
         composable(route = Routes.Home.routes) {
             Home()
+        }
+
+        composable(route = Routes.Login.routes) {
+            Login()
+        }
+
+        composable(route = Routes.Register.routes) {
+            Register()
         }
 
         composable(route = Routes.Notification.routes) {
