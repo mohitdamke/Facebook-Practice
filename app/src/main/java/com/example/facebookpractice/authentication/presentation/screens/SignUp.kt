@@ -159,7 +159,7 @@ fun SignUp(
                         return@Button
                     } else {
                         scope.launch {
-                            viewModel.registerUser(email, password)
+                            viewModel.registerUser(email, password, name, username, surname)
                         }
                     }
                 }) {

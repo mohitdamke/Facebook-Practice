@@ -15,8 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -126,7 +129,7 @@ fun SignIn(
 
 
         Image(
-            painter = painterResource(id = R.drawable.ic_launcher_background),
+            painter = painterResource(id = R.drawable.google),
             contentDescription = "",
             modifier = Modifier
                 .clickable {
@@ -151,6 +154,11 @@ fun SignIn(
         }
 
         Spacer(modifier = Modifier.height(30.dp))
+
+        Text(text = "or")
+
+        Spacer(modifier = Modifier.height(30.dp))
+
         Button(onClick = {
             scope.launch {
                 viewModel.loginUser(email, password)
@@ -161,7 +169,7 @@ fun SignIn(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Text(text = "or")
+        Text(text = "Click here for getting register")
         Spacer(modifier = Modifier.height(10.dp))
 
         Button(onClick = {
@@ -179,8 +187,8 @@ fun SignIn(
         scope.launch {
             if (state.value?.isSuccess?.isNotEmpty() == true) {
                 val success = state.value?.isSuccess
-                navController.navigate(Screens.HomePage.route){
-                    popUpTo(Screens.SignInScreen.route){
+                navController.navigate(Screens.HomePage.route) {
+                    popUpTo(Screens.SignInScreen.route) {
                         inclusive = true
                     }
                 }
