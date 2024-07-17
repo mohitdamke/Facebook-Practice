@@ -27,11 +27,11 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.Login.routes) {
-            Login()
+            Login(navController = navController)
         }
 
         composable(route = Routes.Register.routes) {
-            Register()
+            Register(navController = navController)
         }
 
         composable(route = Routes.Notification.routes) {

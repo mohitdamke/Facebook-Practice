@@ -25,10 +25,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.facebookpractice.common.OutlineText
+import com.example.facebookpractice.navigation.Routes
 
 @Composable
-fun Register(modifier: Modifier = Modifier) {
+fun Register(
+    modifier: Modifier = Modifier, navController: NavHostController
+) {
 
     var name by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
@@ -89,11 +93,17 @@ fun Register(modifier: Modifier = Modifier) {
 
                 Spacer(modifier = Modifier.padding(top = 30.dp))
                 Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "Login")
+                    Text(text = "Register")
                 }
                 Spacer(modifier = Modifier.padding(top = 30.dp))
-                Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "Register")
+                Button(onClick = {
+                    navController.navigate(Routes.Login.routes) {
+                        popUpTo(Routes.Register.routes) {
+                            inclusive = true
+                        }
+                    }
+                }, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "Login")
                 }
             }
         }

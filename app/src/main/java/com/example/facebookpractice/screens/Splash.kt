@@ -31,6 +31,10 @@ fun Splash(
     }
     LaunchedEffect(key1 = true) {
         delay(1000)
-        navController.navigate(Routes.BottomNav.routes)
+        navController.navigate(Routes.Login.routes){
+            popUpTo(Routes.Splash.routes) {
+                inclusive = true
+            }
+        }
     }
 }

@@ -22,10 +22,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.facebookpractice.common.OutlineText
+import com.example.facebookpractice.navigation.Routes
 
 @Composable
-fun Login(modifier: Modifier = Modifier) {
+fun Login(modifier: Modifier = Modifier, navController: NavHostController) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -58,13 +60,15 @@ fun Login(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.padding(top = 30.dp))
 
         Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Register")
+            Text(text = "Login")
         }
 
         Spacer(modifier = Modifier.padding(top = 30.dp))
 
-        Button(onClick = { /*TODO*/ }, modifier = Modifier.fillMaxWidth()) {
-            Text(text = "Login")
+        Button(onClick = {
+            navController.navigate(Routes.Register.routes)
+        }, modifier = Modifier.fillMaxWidth()) {
+            Text(text = "Register")
         }
 
     }

@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color.Companion.Gray
@@ -38,7 +39,7 @@ fun OutlineText(
 ) {
     OutlinedTextField(
         value = value,
-        onValueChange = { onValueChange },
+        onValueChange = { onValueChange(it) },
         leadingIcon = {
             Icon(
                 imageVector = icons,
@@ -71,10 +72,10 @@ fun OutlineText(
 @Preview(showBackground = true)
 @Composable
 private fun prev() {
-    var text by remember { mutableStateOf("") }
+    var text by rememberSaveable { mutableStateOf("") }
     OutlineText(
         value = text,
-        onValueChange = {text = it},
+        onValueChange = { text = it },
         icons = Icons.Rounded.Preview,
         label = "Enter Your Text"
     )
