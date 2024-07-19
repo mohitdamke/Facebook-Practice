@@ -1,10 +1,9 @@
-package com.example.facebookpractice.common
+package com.example.threadpractice.common
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.rounded.Preview
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -14,7 +13,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -40,7 +38,8 @@ fun OutlineText(
     OutlinedTextField(
         value = value,
         onValueChange = { onValueChange(it) },
-        leadingIcon = {
+        singleLine = true
+        ,leadingIcon = {
             Icon(
                 imageVector = icons,
                 contentDescription = "",
@@ -51,7 +50,7 @@ fun OutlineText(
             Text(
                 text = "Type your $label", fontSize = 16.sp,
                 fontWeight = FontWeight.W600, color = Gray,
-                fontFamily = FontFamily.SansSerif
+                fontFamily = FontFamily.SansSerif, maxLines = 1
             )
         },
         colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -64,7 +63,7 @@ fun OutlineText(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next
         ),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(), minLines = 1
     )
 }
 

@@ -1,4 +1,4 @@
-package com.example.facebookpractice
+package com.example.threadpractice
 
 import org.junit.Test
 

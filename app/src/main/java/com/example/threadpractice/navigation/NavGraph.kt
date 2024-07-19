@@ -1,18 +1,18 @@
-package com.example.facebookpractice.navigation
+package com.example.threadpractice.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.facebookpractice.screens.AddThreads
-import com.example.facebookpractice.screens.BottomNav
-import com.example.facebookpractice.screens.Home
-import com.example.facebookpractice.screens.Login
-import com.example.facebookpractice.screens.Notification
-import com.example.facebookpractice.screens.Profile
-import com.example.facebookpractice.screens.Register
-import com.example.facebookpractice.screens.Search
-import com.example.facebookpractice.screens.Splash
+import com.example.threadpractice.screens.AddThreads
+import com.example.threadpractice.screens.BottomNav
+import com.example.threadpractice.screens.Home
+import com.example.threadpractice.screens.Login
+import com.example.threadpractice.screens.Notification
+import com.example.threadpractice.screens.Profile
+import com.example.threadpractice.screens.Register
+import com.example.threadpractice.screens.Search
+import com.example.threadpractice.screens.Splash
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -23,7 +23,7 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.Home.routes) {
-            Home()
+            Home(navController = navController)
         }
 
         composable(route = Routes.Login.routes) {
@@ -35,20 +35,20 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.Notification.routes) {
-            Notification()
+            Notification(navController = navController)
         }
 
         composable(route = Routes.Search.routes) {
-            Search()
+            Search(navController = navController)
         }
 
 
         composable(route = Routes.Profile.routes) {
-            Profile()
+            Profile(navController = navController)
         }
 
         composable(route = Routes.AddThread.routes) {
-            AddThreads()
+            AddThreads(navController = navController)
         }
 
         composable(route = Routes.BottomNav.routes) {

@@ -1,4 +1,4 @@
-package com.example.facebookpractice.ui.theme
+package com.example.threadpractice.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.facebookpractice"
+    namespace = "com.example.threadpractice"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.facebookpractice"
+        applicationId = "com.example.threadpractice"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -63,6 +63,9 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.androidx.runtime.livedata)
+    implementation(libs.firebase.storage.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

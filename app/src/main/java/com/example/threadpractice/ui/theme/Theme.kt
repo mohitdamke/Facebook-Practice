@@ -1,4 +1,4 @@
-package com.example.facebookpractice.ui.theme
+package com.example.threadpractice.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

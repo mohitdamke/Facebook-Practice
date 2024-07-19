@@ -1,4 +1,4 @@
-package com.example.facebookpractice
+package com.example.threadpractice
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

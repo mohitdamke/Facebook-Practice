@@ -1,4 +1,4 @@
-package com.example.facebookpractice.navigation
+package com.example.threadpractice.navigation
 
 sealed class Routes(val routes: String) {
     object Home : Routes("home")

@@ -1,4 +1,4 @@
-package com.example.facebookpractice
+package com.example.threadpractice
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

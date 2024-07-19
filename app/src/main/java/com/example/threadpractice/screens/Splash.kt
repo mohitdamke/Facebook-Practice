@@ -1,4 +1,4 @@
-package com.example.facebookpractice.screens
+package com.example.threadpractice.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.facebookpractice.R
-import com.example.facebookpractice.navigation.Routes
+import com.example.threadpractice.R
+import com.example.threadpractice.navigation.Routes
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
@@ -44,6 +44,7 @@ fun Splash(
                 popUpTo(Routes.Splash.routes) {
                     inclusive = true
                 }
+
             }
         }
     }

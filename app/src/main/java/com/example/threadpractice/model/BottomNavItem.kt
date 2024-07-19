@@ -1,4 +1,4 @@
-package com.example.facebookpractice.model
+package com.example.threadpractice.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

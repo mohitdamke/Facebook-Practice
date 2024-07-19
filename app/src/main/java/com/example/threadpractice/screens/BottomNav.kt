@@ -1,4 +1,4 @@
-package com.example.facebookpractice.screens
+package com.example.threadpractice.screens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -19,8 +19,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.facebookpractice.model.BottomNavItem
-import com.example.facebookpractice.navigation.Routes
+import com.example.threadpractice.model.BottomNavItem
+import com.example.threadpractice.navigation.Routes
 
 @Composable
 fun BottomNav(navController: NavHostController) {
@@ -34,24 +34,23 @@ fun BottomNav(navController: NavHostController) {
         )
         {
             composable(route = Routes.Home.routes) {
-                Home()
+                Home(navController = navController)
             }
 
             composable(route = Routes.Notification.routes) {
-                Notification()
+                Notification(navController = navController)
             }
 
             composable(route = Routes.Search.routes) {
-                Search()
+                Search(navController = navController)
             }
 
-
             composable(route = Routes.Profile.routes) {
-                Profile()
+                Profile(navController = navController)
             }
 
             composable(route = Routes.AddThread.routes) {
-                AddThreads()
+                AddThreads(navController = navController)
             }
 
         }

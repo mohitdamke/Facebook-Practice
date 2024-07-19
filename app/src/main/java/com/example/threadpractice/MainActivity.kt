@@ -1,12 +1,12 @@
-package com.example.facebookpractice
+package com.example.threadpractice
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.rememberNavController
-import com.example.facebookpractice.navigation.NavGraph
-import com.example.facebookpractice.ui.theme.FacebookPracticeTheme
+import com.example.threadpractice.navigation.NavGraph
+import com.example.threadpractice.ui.theme.FacebookPracticeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
