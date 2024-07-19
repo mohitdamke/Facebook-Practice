@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "431551028090",
+    "project_id": "thread-practice-99414",
+    "storage_bucket": "thread-practice-99414.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:431551028090:android:536d136c796a42a370d4c3",
+        "android_client_info": {
+          "package_name": "com.example.threadpractice"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3gpDhVWbH4igCo5egjns_K7zVvs2TWc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
