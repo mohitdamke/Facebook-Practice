@@ -33,7 +33,7 @@ fun Login(modifier: Modifier = Modifier, navController: NavHostController) {
     var password by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(20.dp),
         verticalArrangement = Arrangement.Center,

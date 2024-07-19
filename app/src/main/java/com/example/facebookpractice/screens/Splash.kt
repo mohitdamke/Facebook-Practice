@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.facebookpractice.R
 import com.example.facebookpractice.navigation.Routes
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 
@@ -31,9 +32,18 @@ fun Splash(
     }
     LaunchedEffect(key1 = true) {
         delay(1000)
-        navController.navigate(Routes.Login.routes){
-            popUpTo(Routes.Splash.routes) {
-                inclusive = true
+
+        if (FirebaseAuth.getInstance().currentUser == null) {
+            navController.navigate(Routes.Login.routes) {
+                popUpTo(Routes.Splash.routes) {
+                    inclusive = true
+                }
+            }
+        } else {
+            navController.navigate(Routes.BottomNav.routes) {
+                popUpTo(Routes.Splash.routes) {
+                    inclusive = true
+                }
             }
         }
     }
