@@ -16,7 +16,7 @@ import com.example.threadpractice.screens.Splash
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = Routes.Splash.routes) {
+    NavHost(navController = navController, startDestination = Routes.AddThread.routes) {
 
         composable(route = Routes.Splash.routes) {
             Splash(navController = navController)
