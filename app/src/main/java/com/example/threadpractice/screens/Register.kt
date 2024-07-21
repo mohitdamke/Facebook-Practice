@@ -60,7 +60,6 @@ fun Register(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     context: Context = LocalContext.current
-//    = rememberNavController()
 ) {
     val authViewModel: AuthViewModel = viewModel()
     val firebaseUser by authViewModel.firebaseUser.observeAsState(null)

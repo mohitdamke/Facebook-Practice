@@ -9,7 +9,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,10 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Backspace
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.automirrored.filled.MultilineChart
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -51,26 +47,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.threadpractice.R
+import com.example.threadpractice.navigation.Routes
 import com.example.threadpractice.util.SharedPref
 import com.example.threadpractice.viewmodel.AddThreadViewModel
-import com.example.threadpractice.viewmodel.AuthViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -78,14 +69,33 @@ fun AddThreads(
     modifier: Modifier = Modifier, navController: NavHostController
 ) {
     val addThreadViewModel: AddThreadViewModel = viewModel()
-    val isPosted by addThreadViewModel.isPosted.observeAsState(null)
+    val isPosted by addThreadViewModel.isPosted.observeAsState(false)
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var postImageUri by remember {
-        mutableStateOf<Uri?>(null)
+
+    var thread by rememberSaveable { mutableStateOf("") }
+
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+
+    LaunchedEffect(isPosted) {
+        if (isPosted) {
+            thread = ""
+            imageUri = null
+            Toast.makeText(
+                context,
+                "Post have been Successfully Uploaded",
+                Toast.LENGTH_SHORT
+            ).show()
+            navController.navigate(Routes.Home.routes) {
+                popUpTo(Routes.AddThread.routes) {
+                    inclusive = true
+                }
+            }
+        }
     }
-    val focusManager = LocalFocusManager.current
+
 
     val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         android.Manifest.permission.READ_MEDIA_IMAGES
@@ -94,18 +104,20 @@ fun AddThreads(
     }
 
     val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-            postImageUri = uri
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        )
+        { uri: Uri? ->
+            imageUri = uri
         }
     val permissionLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission()) {
-
-                isGranted: Boolean ->
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
             if (isGranted) {
             } else {
             }
         }
-    var text by rememberSaveable { mutableStateOf("") }
 
     Scaffold(
         topBar = {
@@ -117,7 +129,13 @@ fun AddThreads(
                     Text("Add Threads")
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /* TODO something */ }) {
+                    IconButton(onClick = {
+                        navController.navigate(Routes.Home.routes) {
+                            popUpTo(Routes.AddThread.routes) {
+                                inclusive = true
+                            }
+                        }
+                    }) {
                         Image(
                             painter = painterResource(id = R.drawable.baseline_close_24),
                             contentDescription = null
@@ -127,17 +145,24 @@ fun AddThreads(
                 actions = {
                     Button(
                         onClick = {
-                            if (postImageUri == null || text.isEmpty()){
-                                Toast.makeText(context, "Enter All Fields", Toast.LENGTH_SHORT)
-                                    .show()
-                            } else { }
-                                Toast.makeText(
-                                    context,
-                                    "Post have been Successfully Uploaded",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            if (imageUri == null) {
+                                addThreadViewModel.saveData(
+                                    thread,
+                                    FirebaseAuth.getInstance().currentUser!!.uid, ""
+                                )
+                            } else {
+                                addThreadViewModel.saveImage(
+                                    thread,
+                                    FirebaseAuth.getInstance().currentUser!!.uid, imageUri!!
+                                )
+
                             }
-                        ,
+                            Toast.makeText(
+                                context,
+                                "Post have been Successfully Uploaded",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
                         colors = ButtonDefaults.buttonColors(Color.Black)
                     ) {
                         Text(text = "Post", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
@@ -179,7 +204,7 @@ fun AddThreads(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Done
                 ),
-                value = text, onValueChange = { text = it }, label = { Text("Enter Title") },
+                value = thread, onValueChange = { thread = it }, label = { Text("Enter Title") },
                 modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp, top = 20.dp)
                     .fillMaxWidth(),
@@ -193,8 +218,8 @@ fun AddThreads(
 
             ) {
                 Image(
-                    painter = if (postImageUri != null) rememberAsyncImagePainter(
-                        model = postImageUri
+                    painter = if (imageUri != null) rememberAsyncImagePainter(
+                        model = imageUri
                     )
                     else
                         painterResource(id = R.drawable.add),
@@ -206,7 +231,8 @@ fun AddThreads(
                         .clip(RectangleShape)
                         .clickable {
                             val isGranted = ContextCompat.checkSelfPermission(
-                                context, permissionToRequest
+                                context,
+                                permissionToRequest
                             ) == PackageManager.PERMISSION_GRANTED
 
                             if (isGranted) {
@@ -227,7 +253,7 @@ fun AddThreads(
                     modifier = Modifier
                         .size(50.dp)
                         .clickable {
-                            postImageUri = null
+                            imageUri = null
                         }
                         .padding(top = 14.dp, bottom = 10.dp)
                         .align(Alignment.TopEnd)

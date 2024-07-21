@@ -26,7 +26,7 @@ class AuthViewModel : ViewModel() {
     val userRef = db.getReference("users")
 
     private val storageRef = Firebase.storage.reference
-    val imageRef = storageRef.child("users/${UUID.randomUUID()}.jpg")
+    private val imageRef = storageRef.child("users/${UUID.randomUUID()}.jpg")
 
     private val _firebaseUser = MutableLiveData<FirebaseUser?>()
     val firebaseUser: LiveData<FirebaseUser?> = _firebaseUser
@@ -46,7 +46,7 @@ class AuthViewModel : ViewModel() {
                     getData(auth.currentUser!!.uid, context)
                     _error.postValue("You have successfully login")
                 } else {
-                _error.postValue( task.exception?.message)
+                    _error.postValue(task.exception?.message)
                 }
             }
     }
@@ -69,7 +69,15 @@ class AuthViewModel : ViewModel() {
         })
     }
 
-    fun register(email: String, password: String, name: String, bio: String, userName: String, imageUri: Uri, context: Context) {
+    fun register(
+        email: String,
+        password: String,
+        name: String,
+        bio: String,
+        userName: String,
+        imageUri: Uri,
+        context: Context
+    ) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -122,9 +130,11 @@ class AuthViewModel : ViewModel() {
         context: Context
     ) {
 
-        val userData = UserModel(email, password, name, bio, userName, toString, uid!!)
+        val userData = UserModel(
+            email, password, name, bio, userName, toString, uid!!
+        )
 
-        userRef.child(uid!!).setValue(userData)
+        userRef.child(uid).setValue(userData)
             .addOnSuccessListener {
                 SharedPref.storeData(
                     name, userName, email, bio, toString, context
