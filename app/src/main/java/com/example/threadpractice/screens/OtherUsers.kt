@@ -28,9 +28,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.example.threadpractice.common.ThreadItem
-import com.example.threadpractice.model.UserModel
 import com.example.threadpractice.navigation.Routes
 import com.example.threadpractice.util.SharedPref
 import com.example.threadpractice.viewmodel.AuthViewModel
@@ -38,51 +38,45 @@ import com.example.threadpractice.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun Profile(
+fun OtherUsers(
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    uid: String,
     context: Context = LocalContext.current
 ) {
+
+    var currentUserId = ""
+
+    if (FirebaseAuth.getInstance().currentUser != null) {
+        currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+    }
+
     val authViewModel: AuthViewModel = viewModel()
     val firebaseUser by authViewModel.firebaseUser.observeAsState(null)
 
     val userViewModel: UserViewModel = viewModel()
-    val threads by userViewModel.threads.observeAsState(null)
 
+    val threads by userViewModel.threads.observeAsState(null)
+    val users by userViewModel.users.observeAsState(null)
     val followerList by userViewModel.followerList.observeAsState(null)
     val followingList by userViewModel.followingList.observeAsState(null)
+    val isFollowing = followerList?.contains(currentUserId) == true
 
+    userViewModel.fetchThreads(uid)
+    userViewModel.fetchUsers(uid)
+    userViewModel.getFollowers(uid)
+    userViewModel.getFollowing(uid)
 
-    if (firebaseUser != null)
-        userViewModel.fetchThreads(firebaseUser!!.uid)
-
-
-    var currentUserId = ""
-    if (FirebaseAuth.getInstance().currentUser != null)
-        currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
-
-    if (currentUserId != "") {
-        userViewModel.getFollowers(currentUserId)
-        userViewModel.getFollowing(currentUserId)
-        userViewModel.fetchThreads(currentUserId)
-    }
-
-    val user = UserModel(
-        email = SharedPref.getEmail(context),
-        name = SharedPref.getName(context),
-        userName = SharedPref.getUserName(context),
-        bio = SharedPref.getBio(context),
-        imageUrl = SharedPref.getImageUrl(context),
-    )
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = modifier.fillMaxSize()
         ) {
             item {
-                Text(text = "Profile Screen", fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = "User Profile", fontSize = 30.sp, fontWeight = FontWeight.SemiBold)
+
                 Spacer(modifier = modifier.padding(10.dp))
                 Column(
                     modifier = modifier.fillMaxWidth(),
@@ -99,37 +93,47 @@ fun Profile(
                             modifier = modifier
                                 .weight(0.7f)
                         ) {
-                            Text(text = "Name ${user.name}", fontSize = 26.sp)
+                            Text(text = users!!.name, fontSize = 26.sp)
                             Spacer(modifier = modifier.padding(4.dp))
-                            Text(text = "@${user.userName}", fontSize = 16.sp)
+                            Text(text = "@${users!!.userName}", fontSize = 16.sp)
                             Spacer(modifier = modifier.padding(4.dp))
                             Text(
-                                text = user.bio,
+                                text = users!!.bio,
                                 fontSize = 18.sp
                             )
                             Spacer(modifier = modifier.padding(4.dp))
 
-                            Text(text = "${followerList?.size ?: "0"} Follower", fontSize = 18.sp)
+                            Text(text = "${followerList?.size} Followers", fontSize = 18.sp)
                             Spacer(modifier = modifier.padding(4.dp))
 
-                            Text(text = "${followingList?.size ?: "0"} Following", fontSize = 18.sp)
+                            Text(text = "${followingList?.size} Following", fontSize = 18.sp)
                             Spacer(modifier = modifier.padding(top = 8.dp))
                         }
                         Button(
                             onClick = {
-                                authViewModel.logout()
+                                if (currentUserId != "") {
+                                    userViewModel.followOrUnfollowUser(
+                                        uid,
+                                        currentUserId,
+                                        isFollowing
+                                    )
+                                }
                             }, modifier = Modifier.weight(0.3f)
                         ) {
-                            Text(text = "Logout")
+                            Text(
+                                text = if (isFollowing) {
+                                    "Following"
+                                } else {
+                                    "Follow"
+                                }
+                            )
                         }
                     }
                     Spacer(modifier = Modifier.padding(16.dp))
 
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = SharedPref.getImageUrl(
-                                context
-                            )
+                            model = users!!.imageUrl
                         ),
                         contentDescription = null,
                         modifier = modifier
@@ -140,16 +144,18 @@ fun Profile(
                 Spacer(modifier = Modifier.padding(16.dp))
 
             }
-            item {
-                this@LazyColumn.items(
-                    threads ?: emptyList()
-                ) { pair ->
-                    ThreadItem(
-                        thread = pair,
-                        users = user,
-                        navHostController = navController,
-                        userId = SharedPref.getUserName(context),
-                    )
+            if (threads != null && users != null) {
+                item {
+                    this@LazyColumn.items(
+                        threads ?: emptyList()
+                    ) { pair ->
+                        ThreadItem(
+                            thread = pair,
+                            users = users!!,
+                            navHostController = navController,
+                            userId = SharedPref.getUserName(context),
+                        )
+                    }
                 }
             }
         }

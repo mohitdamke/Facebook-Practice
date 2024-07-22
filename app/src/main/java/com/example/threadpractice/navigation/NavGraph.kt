@@ -9,6 +9,7 @@ import com.example.threadpractice.screens.BottomNav
 import com.example.threadpractice.screens.Home
 import com.example.threadpractice.screens.Login
 import com.example.threadpractice.screens.Notification
+import com.example.threadpractice.screens.OtherUsers
 import com.example.threadpractice.screens.Profile
 import com.example.threadpractice.screens.Register
 import com.example.threadpractice.screens.Search
@@ -55,6 +56,10 @@ fun NavGraph(navController: NavHostController) {
             BottomNav(navController = navController)
         }
 
+        composable(route = Routes.OtherUsers.routes) {
+            val data = it.arguments!!.getString("data")
+            OtherUsers(navController = navController, uid =  data!!)
+        }
 
     }
 }

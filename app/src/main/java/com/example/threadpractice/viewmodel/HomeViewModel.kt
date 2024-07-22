@@ -25,10 +25,15 @@ class HomeViewModel : ViewModel() {
     }
 
     private fun fetchThreadsAndUsers(onResult: (List<Pair<ThreadModel, UserModel>>) -> Unit) {
+
         thread.addValueEventListener(object : ValueEventListener {
+
             override fun onDataChange(snapshot: DataSnapshot) {
+
                 val result = mutableListOf<Pair<ThreadModel, UserModel>>()
+
                 for (threadSnapshot in snapshot.children) {
+
                     val thread = threadSnapshot.getValue(ThreadModel::class.java)
                     thread.let {
                         fetchUserFromThread(it!!) { user ->
@@ -37,7 +42,6 @@ class HomeViewModel : ViewModel() {
                             if (result.size == snapshot.childrenCount.toInt()) {
                                 onResult(result)
                             }
-
 
                         }
                     }
@@ -55,7 +59,7 @@ class HomeViewModel : ViewModel() {
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val user = snapshot.getValue(UserModel::class.java)
-                    user?.let { onResult }
+                    user?.let(onResult)
                 }
 
                 override fun onCancelled(error: DatabaseError) {

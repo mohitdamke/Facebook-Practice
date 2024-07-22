@@ -11,7 +11,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.threadpractice.common.ThreadItem
@@ -21,20 +23,17 @@ import com.google.firebase.auth.FirebaseAuth
 @Composable
 fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
     val homeViewModel: HomeViewModel = viewModel()
+
     val context = LocalContext.current
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+    val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
     val threadAndUsers by homeViewModel.threadsAndUsers.observeAsState(null)
-    Column {
-        Text(text = "raees")
+
+    Column(modifier = modifier.fillMaxSize().padding(6.dp)) {
+        Text(text = "Home Page", fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
 
         LazyColumn(modifier = modifier.fillMaxSize()) {
-            item {
-                Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "raees")
-                Text(text = "raees")
-                Text(text = "raees")
-            }}
             items(threadAndUsers ?: emptyList()) { pairs ->
                 ThreadItem(
                     thread = pairs.first,
@@ -42,7 +41,6 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
                     navHostController = navController,
                     userId = userId
                 )
-
             }
         }
     }

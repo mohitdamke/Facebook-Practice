@@ -13,6 +13,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.util.UUID
@@ -39,29 +40,30 @@ class AuthViewModel : ViewModel() {
     }
 
     fun login(email: String, password: String, context: Context) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _firebaseUser.postValue(auth.currentUser)
-                    getData(auth.currentUser!!.uid, context)
-                    _error.postValue("You have successfully login")
-                } else {
-                    _error.postValue(task.exception?.message)
-                }
+        auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                _firebaseUser.postValue(auth.currentUser)
+                getData(auth.currentUser!!.uid, context)
+                _error.postValue("You have successfully login")
+            } else {
+                _error.postValue(task.exception?.message)
             }
+        }
     }
 
     private fun getData(uid: String, context: Context) {
+
+
         userRef.child(uid).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val userData = snapshot.getValue(UserModel::class.java)
                 SharedPref.storeData(
-                    userData!!.name,
-                    userData.userName,
-                    userData.email,
-                    userData.bio,
-                    userData.imageUrl,
-                    context
+                    name = userData!!.name,
+                    userName = userData.userName,
+                    email = userData.email,
+                    bio = userData.bio,
+                    imageUri = userData.imageUrl,
+                    context = context
                 )
             }
 
@@ -78,25 +80,25 @@ class AuthViewModel : ViewModel() {
         imageUri: Uri,
         context: Context
     ) {
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    _firebaseUser.postValue(firebaseUser.value)
-                    saveImage(
-                        email,
-                        password,
-                        name,
-                        bio,
-                        userName,
-                        imageUri,
-                        auth.currentUser?.uid,
-                        context
-                    )
-                } else {
-                    _error.value = "Register failed. Please try again."
-                }
+        auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                _firebaseUser.postValue(firebaseUser.value)
+                saveImage(
+                    email = email,
+                    password = password,
+                    name = name,
+                    bio = bio,
+                    userName = userName,
+                    imageUri = imageUri,
+                    uid = auth.currentUser?.uid,
+                    context = context
+                )
+            } else {
+                _error.postValue(task.exception?.message)
             }
+        }
     }
+
 
     private fun saveImage(
         email: String,
@@ -112,7 +114,16 @@ class AuthViewModel : ViewModel() {
         val uploadTask = imageRef.putFile(imageUri!!)
         uploadTask.addOnSuccessListener {
             imageRef.downloadUrl.addOnSuccessListener { uri ->
-                saveData(email, password, name, bio, userName, uri.toString(), uid, context)
+                saveData(
+                    email = email,
+                    password = password,
+                    name = name,
+                    bio = bio,
+                    userName = userName,
+                    toString = uri.toString(),
+                    uid = uid,
+                    context = context
+                )
             }
         }
 
@@ -129,17 +140,33 @@ class AuthViewModel : ViewModel() {
         uid: String?,
         context: Context
     ) {
+        val firestoreDb = Firebase.firestore
+        val followersRef = firestoreDb.collection("followers").document(uid!!)
+        val followingRef = firestoreDb.collection("following").document(uid)
+
+        followingRef.set(mapOf("followingIds" to listOf<String>()))
+        followersRef.set(mapOf("followerIds" to listOf<String>()))
 
         val userData = UserModel(
-            email, password, name, bio, userName, toString, uid!!
+            email = email,
+            password = password,
+            name = name,
+            bio = bio,
+            userName = userName,
+            imageUrl = toString,
+            uid = uid
         )
 
-        userRef.child(uid).setValue(userData)
-            .addOnSuccessListener {
-                SharedPref.storeData(
-                    name, userName, email, bio, toString, context
-                )
-            }.addOnFailureListener {}
+        userRef.child(uid).setValue(userData).addOnSuccessListener {
+            SharedPref.storeData(
+                name = name,
+                userName = userName,
+                email = email,
+                bio = bio,
+                imageUri = toString,
+                context = context
+            )
+        }.addOnFailureListener {}
 
 
     }

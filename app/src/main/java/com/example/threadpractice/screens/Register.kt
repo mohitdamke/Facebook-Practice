@@ -63,6 +63,7 @@ fun Register(
 ) {
     val authViewModel: AuthViewModel = viewModel()
     val firebaseUser by authViewModel.firebaseUser.observeAsState(null)
+    val error by authViewModel.error.observeAsState()
 
 
     var name by remember { mutableStateOf("") }
@@ -72,6 +73,10 @@ fun Register(
     var password by remember { mutableStateOf("") }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    error?.let {
+        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+    }
 
     val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         Manifest.permission.READ_MEDIA_IMAGES
@@ -209,13 +214,13 @@ fun Register(
                         return@Button
                     } else {
                         authViewModel.register(
-                            email,
-                            password,
-                            name,
-                            username,
-                            bio,
-                            imageUri!!,
-                            context
+                            email = email,
+                            password = password,
+                            name = name,
+                            userName = username,
+                            bio = bio,
+                            imageUri = imageUri!!,
+                            context = context
                         )
                         Toast.makeText(
                             context,
