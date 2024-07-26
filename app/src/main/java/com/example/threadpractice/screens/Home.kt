@@ -37,24 +37,29 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.threadpractice.common.ThreadItem
 import com.example.threadpractice.common.UsersStoryHomeItem
+import com.example.threadpractice.model.UserModel
 import com.example.threadpractice.navigation.Routes
 import com.example.threadpractice.util.SharedPref
 import com.example.threadpractice.viewmodel.AddStoryViewModel
 import com.example.threadpractice.viewmodel.HomeViewModel
 import com.example.threadpractice.viewmodel.SearchViewModel
 import com.example.threadpractice.viewmodel.StoryViewModel
+import com.example.threadpractice.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
+fun Home(modifier: Modifier = Modifier, navController: NavHostController, userModel: UserModel = UserModel()) {
     val homeViewModel: HomeViewModel = viewModel()
     val storyViewModel: StoryViewModel = viewModel()
     val addStoryViewModel: AddStoryViewModel = viewModel()
     val searchViewModel: SearchViewModel = viewModel()
     val usersList by searchViewModel.userList.observeAsState(null)
     val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+    val userViewModel: UserViewModel = viewModel()
 
+    val story by userViewModel.story.observeAsState(null)
     val context = LocalContext.current
+//    val userModel =
 
     val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
@@ -62,6 +67,8 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
     val storyAndUsers by storyViewModel.storyAndUsers.observeAsState(null)
     LaunchedEffect(Unit) {
         searchViewModel.fetchUsersExcludingCurrentUser(currentUserId)
+        userViewModel.fetchStory(currentUserId)
+
     }
     Column(
         modifier = modifier
@@ -89,9 +96,15 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
                             modifier = Modifier
                                 .size(100.dp)
                                 .clickable {
-                                    if (userId == FirebaseAuth.getInstance().currentUser!!.uid) {
-
-                                        navController.navigate(Routes.AllStory.routes)
+                                    if (storyAndUsers != null && storyAndUsers!!.isNotEmpty()) {
+                                        val routes =
+                                            Routes.AllStory.routes.replace(
+                                                oldValue = "{all_story}",
+                                                newValue = currentUserId
+                                            )
+                                        navController.navigate(routes)
+                                    } else {
+                                        navController.navigate(Routes.AddStory.routes)
                                     }
                                 }
                                 .clip(CircleShape)

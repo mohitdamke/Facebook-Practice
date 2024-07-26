@@ -2,6 +2,7 @@ package com.example.threadpractice.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -27,8 +28,9 @@ fun DetailStoryItem(
         Image(
             painter = rememberAsyncImagePainter(model = story.imageStory),
             contentDescription = null,
-            modifier = Modifier
-                .size(350.dp),
+            modifier = Modifier.fillMaxSize()
+                .size(350.dp)
+            ,
             contentScale = ContentScale.Crop
         )
     }

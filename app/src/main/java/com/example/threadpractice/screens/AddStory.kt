@@ -58,7 +58,6 @@ import com.example.threadpractice.util.SharedPref
 import com.example.threadpractice.viewmodel.AddStoryViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
-import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -149,11 +148,6 @@ fun AddStory(modifier: Modifier = Modifier, navController: NavHostController) {
                                 )
 
                             }
-                            Toast.makeText(
-                                context,
-                                "Story have been Successfully Uploaded",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         },
                         colors = ButtonDefaults.buttonColors(Color.Black)
                     ) {
