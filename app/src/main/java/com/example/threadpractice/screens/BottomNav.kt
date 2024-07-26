@@ -46,7 +46,7 @@ fun BottomNav(navController: NavHostController) {
             }
 
             composable(route = Routes.Profile.routes) {
-                Profile(navController = navController1,)
+                Profile(navController = navController)
             }
 
             composable(route = Routes.AddThread.routes) {

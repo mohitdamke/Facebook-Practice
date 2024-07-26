@@ -2,6 +2,7 @@ package com.example.threadpractice.screens
 
 import android.content.Context
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -56,12 +57,14 @@ fun OtherUsers(
     val userViewModel: UserViewModel = viewModel()
 
     val threads by userViewModel.threads.observeAsState(null)
+    val story by userViewModel.story.observeAsState(null)
     val users by userViewModel.users.observeAsState(null)
     val followerList by userViewModel.followerList.observeAsState(null)
     val followingList by userViewModel.followingList.observeAsState(null)
     val isFollowing = followerList?.contains(currentUserId) == true
 
     userViewModel.fetchThreads(uid)
+    userViewModel.fetchStory(uid)
     userViewModel.fetchUsers(uid)
     userViewModel.getFollowers(uid)
     userViewModel.getFollowing(uid)
@@ -147,6 +150,16 @@ fun OtherUsers(
                         modifier = modifier
                             .size(120.dp)
                             .clip(CircleShape)
+                            .clickable {
+                                if (story != null && story!!.isEmpty()) {
+                                    navController.navigate(Routes.AllStory.routes) {
+                                        popUpTo(Routes.Profile.routes) {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+
+                            }
                     )
                 }
                 Spacer(modifier = Modifier.padding(16.dp))

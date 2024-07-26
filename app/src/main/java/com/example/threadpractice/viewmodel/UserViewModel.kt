@@ -3,6 +3,7 @@ package com.example.threadpractice.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.threadpractice.model.StoryModel
 import com.example.threadpractice.model.ThreadModel
 import com.example.threadpractice.model.UserModel
 import com.example.threadpractice.util.SharedPref
@@ -19,10 +20,14 @@ class UserViewModel : ViewModel() {
 
     private val db = FirebaseDatabase.getInstance()
     val threadRef = db.getReference("threads")
+    val storyRef = db.getReference("story")
     val userRef = db.getReference("users")
 
     private val _threads = MutableLiveData(listOf<ThreadModel>())
     val threads: LiveData<List<ThreadModel>> get() = _threads
+
+    private val _story = MutableLiveData(listOf<StoryModel>())
+    val story: LiveData<List<StoryModel>> get() = _story
 
     private val _followerList = MutableLiveData(listOf<String>())
     val followerList: LiveData<List<String>> get() = _followerList
@@ -57,6 +62,23 @@ class UserViewModel : ViewModel() {
                         it.getValue(ThreadModel::class.java)
                     }
                     _threads.postValue(threadList)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+
+
+            })
+    }
+
+    fun fetchStory(uid: String) {
+        storyRef.orderByChild("userId").equalTo(uid)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val storyList = snapshot.children.mapNotNull {
+                        it.getValue(StoryModel::class.java)
+                    }
+                    _story.postValue(storyList)
                 }
 
                 override fun onCancelled(error: DatabaseError) {

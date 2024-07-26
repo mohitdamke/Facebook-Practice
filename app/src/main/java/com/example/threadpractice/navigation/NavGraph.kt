@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.threadpractice.screens.AddStory
 import com.example.threadpractice.screens.AddThreads
+import com.example.threadpractice.screens.AllStory
 import com.example.threadpractice.screens.BottomNav
 import com.example.threadpractice.screens.Home
 import com.example.threadpractice.screens.Login
@@ -69,6 +70,11 @@ fun NavGraph(navController: NavHostController) {
         composable(route = Routes.StoryDetail.routes) {
 //            val data = it.arguments!!.getString("data")
             StoryDetail(navController = navController)
+        }
+
+        composable(route = Routes.AllStory.routes) {
+            val data = it.arguments!!.getString("all_story")
+            AllStory(navController = navController, uid = data!!)
         }
 
     }

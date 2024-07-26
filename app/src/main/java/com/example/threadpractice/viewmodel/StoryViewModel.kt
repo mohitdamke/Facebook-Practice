@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.threadpractice.model.StoryModel
 import com.example.threadpractice.model.ThreadModel
 import com.example.threadpractice.model.UserModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -14,8 +15,12 @@ import com.google.firebase.firestore.auth.User
 
 class StoryViewModel : ViewModel() {
 
+
     private val db = FirebaseDatabase.getInstance()
+
     val story = db.getReference("story")
+
+//    private val currentUser = FirebaseAuth.getInstance().currentUser // Assuming you have user authentication
 
     private var _storyAndUsers = MutableLiveData<List<Pair<StoryModel, UserModel>>>()
     val storyAndUsers: LiveData<List<Pair<StoryModel, UserModel>>> = _storyAndUsers
@@ -28,6 +33,9 @@ class StoryViewModel : ViewModel() {
 
     private fun fetchStoryAndUsers(onResult: (List<Pair<StoryModel, UserModel>>) -> Unit) {
 
+//        val userStoriesRef = story.orderByChild("userId").equalTo(currentUser?.uid) // Filter by user ID
+
+//        userStoriesRef.addValueEventListener(object : ValueEventListener {
         story.addValueEventListener(object : ValueEventListener {
 
             override fun onDataChange(snapshot: DataSnapshot) {

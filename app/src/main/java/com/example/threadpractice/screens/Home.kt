@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -34,12 +35,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.example.threadpractice.common.StoryItem
 import com.example.threadpractice.common.ThreadItem
+import com.example.threadpractice.common.UsersStoryHomeItem
 import com.example.threadpractice.navigation.Routes
 import com.example.threadpractice.util.SharedPref
 import com.example.threadpractice.viewmodel.AddStoryViewModel
 import com.example.threadpractice.viewmodel.HomeViewModel
+import com.example.threadpractice.viewmodel.SearchViewModel
 import com.example.threadpractice.viewmodel.StoryViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -48,6 +50,9 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
     val homeViewModel: HomeViewModel = viewModel()
     val storyViewModel: StoryViewModel = viewModel()
     val addStoryViewModel: AddStoryViewModel = viewModel()
+    val searchViewModel: SearchViewModel = viewModel()
+    val usersList by searchViewModel.userList.observeAsState(null)
+    val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
 
     val context = LocalContext.current
 
@@ -55,7 +60,9 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
 
     val threadAndUsers by homeViewModel.threadsAndUsers.observeAsState(null)
     val storyAndUsers by storyViewModel.storyAndUsers.observeAsState(null)
-
+    LaunchedEffect(Unit) {
+        searchViewModel.fetchUsersExcludingCurrentUser(currentUserId)
+    }
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -81,6 +88,12 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
                             contentDescription = null,
                             modifier = Modifier
                                 .size(100.dp)
+                                .clickable {
+                                    if (userId == FirebaseAuth.getInstance().currentUser!!.uid) {
+
+                                        navController.navigate(Routes.AllStory.routes)
+                                    }
+                                }
                                 .clip(CircleShape)
                                 .border(width = 2.dp, color = Color.Red, shape = CircleShape),
                             contentScale = ContentScale.Crop
@@ -88,11 +101,13 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
                         Icon(
                             imageVector = Icons.Default.AddCircle,
                             contentDescription = null,
-                            modifier = modifier.clickable {
-                                navController.navigate(Routes.AddStory.routes){
-                                    navController.navigateUp()
+                            modifier = modifier
+                                .clickable {
+                                    navController.navigate(Routes.AddStory.routes) {
+                                        navController.navigateUp()
+                                    }
                                 }
-                            }.align(Alignment.BottomEnd)
+                                .align(Alignment.BottomEnd)
                         )
                     }
                 }
@@ -100,16 +115,25 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
                     Spacer(modifier = modifier.padding(start = 4.dp))
 
                 }
-                items(storyAndUsers ?: emptyList()) { pairs ->
-                    StoryItem(
-                        story = pairs.first,
-                        users = pairs.second,
-                        addStoryViewModel = addStoryViewModel
-                    )
+                item {
+                    if (usersList != null && usersList!!.isNotEmpty()) {
+                        val filterItems =
+                            usersList!!.filter {
+                                it.uid != FirebaseAuth.getInstance().currentUser!!.uid
+                            }
+                        this@LazyRow.items(filterItems) { pairs ->
+                            UsersStoryHomeItem(
+                                users = pairs,
+                                navHostController = navController,
+                            )
+                        }
+                    }
                 }
             }
         }
-        LazyColumn(modifier = modifier.weight(1f)) {
+
+
+        LazyColumn(modifier = modifier.padding(2.dp)) {
             items(threadAndUsers ?: emptyList()) { pairs ->
                 ThreadItem(
                     thread = pairs.first,
@@ -117,9 +141,9 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
                     navController = navController,
                     userId = userId
                 )
+
+
             }
         }
-
-
     }
 }
