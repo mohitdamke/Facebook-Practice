@@ -78,9 +78,7 @@ fun AddStory(modifier: Modifier = Modifier, navController: NavHostController) {
             imageUri = null
 
             navController.navigate(Routes.Home.routes) {
-                popUpTo(Routes.AddStory.routes) {
-                    inclusive = true
-                }
+                navController.navigateUp()
             }
             Toast.makeText(
                 context,
@@ -125,9 +123,7 @@ fun AddStory(modifier: Modifier = Modifier, navController: NavHostController) {
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigate(Routes.Home.routes) {
-                            popUpTo(Routes.AddStory.routes) {
-                                inclusive = true
-                            }
+                            navController.navigateUp()
                         }
                     }) {
                         Image(

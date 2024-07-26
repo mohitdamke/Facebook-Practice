@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImagePainter.State.Empty.painter
 import coil.compose.rememberAsyncImagePainter
 import com.example.threadpractice.common.ThreadItem
 import com.example.threadpractice.navigation.Routes
@@ -109,27 +108,36 @@ fun OtherUsers(
                             Text(text = "${followingList?.size} Following", fontSize = 18.sp)
                             Spacer(modifier = modifier.padding(top = 8.dp))
                         }
-                        Button(
-                            onClick = {
-                                if (currentUserId != "") {
-                                    userViewModel.followOrUnfollowUser(
-                                        uid,
-                                        currentUserId,
-                                        isFollowing
-                                    )
-                                }
-                            }, modifier = Modifier.weight(0.3f)
-                        ) {
-                            Text(
-                                text = if (isFollowing) {
-                                    "Following"
-                                } else {
-                                    "Follow"
-                                }
-                            )
+                        if (uid == currentUserId) {
+                            Button(
+                                onClick = {
+                                }, modifier = modifier.weight(0.3f)
+                            ) {
+                                Text(text = "Edit Profile")
+                            }
+                        } else {
+                            Button(
+                                onClick = {
+                                    if (currentUserId != "") {
+                                        userViewModel.followOrUnfollowUser(
+                                            uid,
+                                            currentUserId,
+                                            isFollowing
+                                        )
+                                    }
+                                }, modifier = modifier.weight(0.3f)
+                            ) {
+                                Text(
+                                    text = if (isFollowing) {
+                                        "Following"
+                                    } else {
+                                        "Follow"
+                                    }
+                                )
+                            }
                         }
                     }
-                    Spacer(modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = modifier.padding(16.dp))
 
                     Image(
                         painter = rememberAsyncImagePainter(
@@ -152,7 +160,7 @@ fun OtherUsers(
                         ThreadItem(
                             thread = pair,
                             users = users!!,
-                            navHostController = navController,
+                            navController = navController,
                             userId = SharedPref.getUserName(context),
                         )
                     }

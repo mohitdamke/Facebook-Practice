@@ -1,6 +1,7 @@
 package com.example.threadpractice.common
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,15 +29,20 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.threadpractice.R
 import com.example.threadpractice.model.ThreadModel
 import com.example.threadpractice.model.UserModel
+import com.example.threadpractice.navigation.Routes
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun ThreadItem(
     modifier: Modifier = Modifier,
     thread: ThreadModel,
     users: UserModel,
-    navHostController: NavHostController,
+    navController: NavHostController,
     userId: String,
 ) {
+
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -54,6 +60,18 @@ fun ThreadItem(
                 modifier = Modifier
                     .clip(CircleShape)
                     .size(60.dp)
+                    .clickable {
+                        if (users.uid == currentUserId) {
+                            navController.navigate(Routes.Profile.routes){
+                                launchSingleTop = true
+                            }
+                        } else{
+                            val routes = Routes.OtherUsers.routes.replace("{data}", users.uid)
+                            navController.navigate(routes) {
+                                launchSingleTop = true
+                            }
+                        }
+                    }
             )
             Column(
                 modifier = Modifier
@@ -66,7 +84,9 @@ fun ThreadItem(
         }
 
         if (thread.image != "") {
-            Card(onClick = { /*TODO*/ }, modifier = modifier.fillMaxWidth().padding(10.dp)) {
+            Card(onClick = { /*TODO*/ }, modifier = modifier
+                .fillMaxWidth()
+                .padding(10.dp)) {
                 Image(
                     painter = rememberAsyncImagePainter(model = thread.image),
                     contentDescription = null,

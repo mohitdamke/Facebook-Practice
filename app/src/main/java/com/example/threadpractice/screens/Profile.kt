@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.threadpractice.common.ThreadItem
@@ -46,7 +47,7 @@ import com.google.firebase.auth.FirebaseAuth
 fun Profile(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
 ) {
     val authViewModel: AuthViewModel = viewModel()
     val firebaseUser by authViewModel.firebaseUser.observeAsState(null)
@@ -161,7 +162,7 @@ fun Profile(
                     ThreadItem(
                         thread = pair,
                         users = user,
-                        navHostController = navController,
+                        navController = navController,
                         userId = SharedPref.getUserName(context),
                     )
                 }
