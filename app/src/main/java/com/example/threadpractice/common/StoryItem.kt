@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.threadpractice.model.StoryModel
 import com.example.threadpractice.model.UserModel
 import com.example.threadpractice.viewmodel.AddStoryViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun StoryItem(
@@ -24,6 +26,7 @@ fun StoryItem(
     users: UserModel,
     addStoryViewModel: AddStoryViewModel,
 ) {
+    val currentUser = FirebaseAuth.getInstance().currentUser?.uid
     Column(modifier = modifier) {
         if (story.imageStory != "") {
 
@@ -35,13 +38,20 @@ fun StoryItem(
             )
         }
     }
+    if (story.userId == currentUser) {
     IconButton(onClick = {
     }) {
         Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+    }}
+    else{
+        IconButton(onClick = {
+        }) {
+            Icon(imageVector = Icons.Default.Share, contentDescription = null)
+        }}
     }
 
 
-}
+
 
 
 
