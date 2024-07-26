@@ -76,6 +76,6 @@ private fun prev() {
         value = text,
         onValueChange = { text = it },
         icons = Icons.Rounded.Preview,
-        label = "Enter Your Text"
+        label = "Text"
     )
 }

@@ -2,38 +2,59 @@ package com.example.threadpractice.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.threadpractice.common.StoryItem
 import com.example.threadpractice.common.ThreadItem
+import com.example.threadpractice.viewmodel.AddStoryViewModel
 import com.example.threadpractice.viewmodel.HomeViewModel
+import com.example.threadpractice.viewmodel.StoryViewModel
+import com.google.android.play.integrity.internal.s
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
     val homeViewModel: HomeViewModel = viewModel()
+    val storyViewModel: StoryViewModel = viewModel()
+    val addStoryViewModel: AddStoryViewModel = viewModel()
 
     val context = LocalContext.current
 
     val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
     val threadAndUsers by homeViewModel.threadsAndUsers.observeAsState(null)
+    val storyAndUsers by storyViewModel.storyAndUsers.observeAsState(null)
 
-    Column(modifier = modifier.fillMaxSize().padding(6.dp)) {
+    Column(modifier = modifier
+        .fillMaxSize()
+        .padding(6.dp)) {
         Text(text = "Home Page", fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
 
-        LazyColumn(modifier = modifier.fillMaxSize()) {
+        LazyRow(modifier = Modifier) {
+            items(storyAndUsers ?: emptyList()) { pairs ->
+                StoryItem(
+                        story = pairs.first,
+                        users = pairs.second,
+                        addStoryViewModel = addStoryViewModel
+                    )
+            }
+        }
+        LazyColumn(modifier = modifier.weight(1f)) {
             items(threadAndUsers ?: emptyList()) { pairs ->
                 ThreadItem(
                     thread = pairs.first,
@@ -43,5 +64,7 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController) {
                 )
             }
         }
+
+
     }
 }

@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
@@ -26,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -38,7 +36,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,8 +46,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -60,39 +55,38 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.threadpractice.R
 import com.example.threadpractice.navigation.Routes
 import com.example.threadpractice.util.SharedPref
-import com.example.threadpractice.viewmodel.AddThreadViewModel
+import com.example.threadpractice.viewmodel.AddStoryViewModel
 import com.google.firebase.auth.FirebaseAuth
+import java.util.UUID
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddThreads(
-    modifier: Modifier = Modifier, navController: NavHostController
-) {
-    val addThreadViewModel: AddThreadViewModel = viewModel()
-    val isPosted by addThreadViewModel.isPosted.observeAsState(false)
+fun AddStory(modifier: Modifier = Modifier, navController: NavHostController) {
+    val addStoryViewModel: AddStoryViewModel = viewModel()
+    val isPosted by addStoryViewModel.isPosted.observeAsState(false)
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    var thread by rememberSaveable { mutableStateOf("") }
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
 
     LaunchedEffect(isPosted) {
         if (isPosted) {
-            thread = ""
             imageUri = null
-            Toast.makeText(
-                context,
-                "Post have been Successfully Uploaded",
-                Toast.LENGTH_SHORT
-            ).show()
+
             navController.navigate(Routes.Home.routes) {
-                popUpTo(Routes.AddThread.routes) {
+                popUpTo(Routes.AddStory.routes) {
                     inclusive = true
                 }
             }
+            Toast.makeText(
+                context,
+                "story have been Successfully Uploaded",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
@@ -126,12 +120,12 @@ fun AddThreads(
                     containerColor = MaterialTheme.colorScheme.background,
                 ),
                 title = {
-                    Text("Add Threads")
+                    Text("Add Story")
                 },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.navigate(Routes.Home.routes) {
-                            popUpTo(Routes.AddThread.routes) {
+                            popUpTo(Routes.AddStory.routes) {
                                 inclusive = true
                             }
                         }
@@ -146,28 +140,28 @@ fun AddThreads(
                     Button(
                         onClick = {
                             if (imageUri == null) {
-                                addThreadViewModel.saveData(
-                                    thread = thread,
+                                addStoryViewModel.saveData(
                                     userId = FirebaseAuth.getInstance().currentUser!!.uid,
+                                    uidStory = UUID.randomUUID().toString(),
                                     image = ""
                                 )
                             } else {
-                                addThreadViewModel.saveImage(
-                                    thread = thread,
+                                addStoryViewModel.saveImage(
                                     userId = FirebaseAuth.getInstance().currentUser!!.uid,
+                                    uidStory = UUID.randomUUID().toString(),
                                     imageUri = imageUri!!
                                 )
 
                             }
                             Toast.makeText(
                                 context,
-                                "Post have been Successfully Uploaded",
+                                "Story have been Successfully Uploaded",
                                 Toast.LENGTH_SHORT
                             ).show()
                         },
                         colors = ButtonDefaults.buttonColors(Color.Black)
                     ) {
-                        Text(text = "Post", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
+                        Text(text = "Add Story", fontSize = 20.sp, fontWeight = FontWeight.SemiBold)
                     }
                 }
             )
@@ -200,18 +194,6 @@ fun AddThreads(
                     fontWeight = FontWeight.Normal
                 )
             }
-
-            OutlinedTextField(
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
-                ),
-                value = thread, onValueChange = { thread = it }, label = { Text("Enter Title") },
-                modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp, top = 20.dp)
-                    .fillMaxWidth(),
-
-                )
 
             Box(
                 modifier = Modifier

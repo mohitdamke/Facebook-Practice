@@ -4,32 +4,32 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.threadpractice.model.ThreadModel
+import com.example.threadpractice.model.StoryModel
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.util.UUID
 
-class AddThreadViewModel : ViewModel() {
+class AddStoryViewModel : ViewModel() {
 
     private val db = FirebaseDatabase.getInstance()
-    val userRef = db.getReference("threads")
+    val storyRef = db.getReference("story")
 
     private val storageRef = Firebase.storage.reference
-    private val imageRef = storageRef.child("threads/${UUID.randomUUID()}.jpg")
+    private val imageRef = storageRef.child("story/${UUID.randomUUID()}.jpg")
 
     private val _isPosted = MutableLiveData<Boolean>()
     val isPosted: LiveData<Boolean> = _isPosted
 
 
     fun saveImage(
-        thread: String, userId: String, imageUri: Uri
+        userId: String, uidStory: String, imageUri: Uri
     ) {
 
         val uploadTask = imageRef.putFile(imageUri)
         uploadTask.addOnSuccessListener {
             imageRef.downloadUrl.addOnSuccessListener { uri ->
-                saveData(thread = thread, userId = userId, image = uri.toString())
+                saveData(userId = userId, uidStory = uidStory, image = uri.toString())
             }
         }
 
@@ -37,17 +37,17 @@ class AddThreadViewModel : ViewModel() {
     }
 
     fun saveData(
-        thread: String, userId: String, image: String
+        userId: String, uidStory: String, image: String
     ) {
 
-        val threadData = ThreadModel(
-            thread = thread,
-            image = image,
+        val storyData = StoryModel(
+            imageStory = image,
             userId = userId,
-            timeStamp = System.currentTimeMillis().toString()
+            timeStamp = System.currentTimeMillis().toString(),
+            uidStory = uidStory
         )
 
-        userRef.child(userRef.push().key!!).setValue(threadData).addOnSuccessListener {
+        storyRef.child(storyRef.push().key!!).setValue(storyData).addOnSuccessListener {
             _isPosted.value = true
         }.addOnFailureListener {
             _isPosted.value = false
