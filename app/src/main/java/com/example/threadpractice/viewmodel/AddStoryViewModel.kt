@@ -1,10 +1,12 @@
 package com.example.threadpractice.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.threadpractice.model.StoryModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
@@ -13,47 +15,57 @@ import java.util.UUID
 class AddStoryViewModel : ViewModel() {
 
     private val db = FirebaseDatabase.getInstance()
-    val storyRef = db.getReference("story")
-
-    private val storageRef = Firebase.storage.reference
-    private val imageRef = storageRef.child("story/${UUID.randomUUID()}.jpg")
+    private val storyRef = db.getReference("story")
 
     private val _isPosted = MutableLiveData<Boolean>()
     val isPosted: LiveData<Boolean> = _isPosted
 
 
+
+    private val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+
+
     fun saveImage(
-        userId: String, uidStory: String, imageUri: Uri
+        userId: String, imageUri: Uri
     ) {
+
+        val storyKey = storyRef.push().key ?: return
+        val imageRef = Firebase.storage.reference.child("story/$storyKey.jpg")
 
         val uploadTask = imageRef.putFile(imageUri)
+
         uploadTask.addOnSuccessListener {
             imageRef.downloadUrl.addOnSuccessListener { uri ->
-                saveData(userId = userId, uidStory = uidStory, image = uri.toString())
+                saveStory(userId = userId, storyKey = storyKey, imageUrl = uri.toString())
+            }.addOnFailureListener { exception ->
+                Log.d("SaveImage", "Failed to get image URL: ${exception.message}")
             }
+        }.addOnFailureListener { exception ->
+            Log.d("SaveImage", "Failed to upload image: ${exception.message}")
         }
-
-
     }
+    fun saveStory(imageUrl: String, storyKey : String, userId: String) {
+        // Generate a new key for the story
+        val newStoryRef = storyRef.push()
+        val storyKey = newStoryRef.key ?: return
 
-    fun saveData(
-        userId: String, uidStory: String, image: String
-    ) {
-
+        // Create a StoryModel object with the generated key
         val storyData = StoryModel(
-            imageStory = image,
+            imageStory = imageUrl,
             userId = userId,
-            timeStamp = System.currentTimeMillis().toString(),
-            uidStory = uidStory
+            timeStamp = System.currentTimeMillis(),
+            storyKey = storyKey
         )
 
-        storyRef.child(storyRef.push().key!!).setValue(storyData).addOnSuccessListener {
+        // Save the story data under the generated key
+        newStoryRef.setValue(storyData).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
             _isPosted.value = true
-        }.addOnFailureListener {
-            _isPosted.value = false
+            } else {
+                _isPosted.value = false
+                Log.d("SaveStory", "Failed to save story: ${task.exception?.message}")
+            }
         }
-
-
     }
 
 

@@ -135,15 +135,14 @@ fun AddStory(modifier: Modifier = Modifier, navController: NavHostController) {
                     Button(
                         onClick = {
                             if (imageUri == null) {
-                                addStoryViewModel.saveData(
+                                addStoryViewModel.saveStory(
                                     userId = FirebaseAuth.getInstance().currentUser!!.uid,
-                                    uidStory = UUID.randomUUID().toString(),
-                                    image = ""
+                                    storyKey = "",  // Provide a default key or handle it separately
+                                    imageUrl = ""
                                 )
                             } else {
                                 addStoryViewModel.saveImage(
                                     userId = FirebaseAuth.getInstance().currentUser!!.uid,
-                                    uidStory = UUID.randomUUID().toString(),
                                     imageUri = imageUri!!
                                 )
 

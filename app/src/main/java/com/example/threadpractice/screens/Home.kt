@@ -48,7 +48,11 @@ import com.example.threadpractice.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun Home(modifier: Modifier = Modifier, navController: NavHostController, userModel: UserModel = UserModel()) {
+fun Home(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    userModel: UserModel = UserModel()
+) {
     val homeViewModel: HomeViewModel = viewModel()
     val storyViewModel: StoryViewModel = viewModel()
     val addStoryViewModel: AddStoryViewModel = viewModel()
@@ -59,7 +63,6 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, userMo
 
     val story by userViewModel.story.observeAsState(null)
     val context = LocalContext.current
-//    val userModel =
 
     val userId = FirebaseAuth.getInstance().currentUser!!.uid
 
@@ -117,7 +120,9 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, userMo
                             modifier = modifier
                                 .clickable {
                                     navController.navigate(Routes.AddStory.routes) {
-                                        navController.navigateUp()
+                                        popUpTo(Routes.Home.routes) {
+                                            inclusive = true
+                                        }
                                     }
                                 }
                                 .align(Alignment.BottomEnd)

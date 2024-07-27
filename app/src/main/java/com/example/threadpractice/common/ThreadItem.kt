@@ -71,7 +71,7 @@ fun ThreadItem(
                                 launchSingleTop = true
                             }
                         }
-                    }
+                    }, contentScale = ContentScale.Crop
             )
             Column(
                 modifier = Modifier
