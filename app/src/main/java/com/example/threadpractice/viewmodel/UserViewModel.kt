@@ -203,8 +203,6 @@ class UserViewModel : ViewModel() {
         })
     }
 
-
-
     private val firestoreDb = Firebase.firestore
     fun followOrUnfollowUser(userId: String, currentUserId: String, isFollowing: Boolean) {
         val followingRef = firestoreDb.collection("following").document(currentUserId)
@@ -228,8 +226,7 @@ class UserViewModel : ViewModel() {
             }
     }
 
-
-    fun getFollowing(userId: String) {
+        fun getFollowing(userId: String) {
         firestoreDb.collection("following").document(userId)
             .addSnapshotListener { snapshot, error ->
 

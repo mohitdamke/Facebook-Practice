@@ -18,6 +18,7 @@ class HomeViewModel : ViewModel() {
     private var _threadsAndUsers = MutableLiveData<List<Pair<ThreadModel, UserModel>>>()
     val threadsAndUsers: LiveData<List<Pair<ThreadModel, UserModel>>> = _threadsAndUsers
 
+
     init {
         fetchThreadsAndUsers {
             _threadsAndUsers.value = it
@@ -67,6 +68,26 @@ class HomeViewModel : ViewModel() {
                 }
             })
     }
+
+     fun toggleLike(threadId: String, userId: String) {
+        val threadRef = FirebaseDatabase.getInstance().getReference("threads").child(threadId)
+        threadRef.child("likes").child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    // User has already liked, remove the like
+                    threadRef.child("likes").child(userId).removeValue()
+                } else {
+                    // User has not liked, add the like
+                    threadRef.child("likes").child(userId).setValue(true)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error
+            }
+        })
+    }
+
 
 }
 

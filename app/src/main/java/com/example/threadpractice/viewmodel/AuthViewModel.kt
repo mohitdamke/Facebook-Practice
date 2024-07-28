@@ -24,7 +24,7 @@ class AuthViewModel : ViewModel() {
     val currentUser = auth.currentUser
 
     private val db = FirebaseDatabase.getInstance()
-    val userRef = db.getReference("users")
+   private val userRef = db.getReference("users")
 
     private val storageRef = Firebase.storage.reference
     private val imageRef = storageRef.child("users/${UUID.randomUUID()}.jpg")

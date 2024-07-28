@@ -69,6 +69,7 @@ fun Home(
     val threadAndUsers by homeViewModel.threadsAndUsers.observeAsState(null)
     val storyAndUsers by storyViewModel.storyAndUsers.observeAsState(null)
     LaunchedEffect(Unit) {
+
         searchViewModel.fetchUsersExcludingCurrentUser(currentUserId)
         userViewModel.fetchStory(currentUserId)
 

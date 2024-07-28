@@ -63,11 +63,13 @@ fun OtherUsers(
     val followingList by userViewModel.followingList.observeAsState(null)
     val isFollowing = followerList?.contains(currentUserId) == true
 
-    userViewModel.fetchThreads(uid)
-    userViewModel.fetchStory(uid)
-    userViewModel.fetchUsers(uid)
-    userViewModel.getFollowers(uid)
-    userViewModel.getFollowing(uid)
+    LaunchedEffect(key1 = uid) {
+        userViewModel.fetchThreads(uid)
+        userViewModel.fetchStory(uid)
+        userViewModel.fetchUsers(uid)
+        userViewModel.getFollowers(uid)
+        userViewModel.getFollowing(uid)
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),

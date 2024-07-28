@@ -15,6 +15,7 @@ import com.example.threadpractice.screens.OtherUsers
 import com.example.threadpractice.screens.Profile
 import com.example.threadpractice.screens.Register
 import com.example.threadpractice.screens.Search
+import com.example.threadpractice.screens.Setting
 import com.example.threadpractice.screens.Splash
 import com.example.threadpractice.screens.StoryDetail
 
@@ -76,6 +77,11 @@ fun NavGraph(navController: NavHostController) {
             val data = it.arguments!!.getString("all_story")
             AllStory(navController = navController, uid = data!!)
         }
+
+        composable(route = Routes.Setting.routes) {
+            Setting(navController = navController)
+        }
+
 
     }
 }

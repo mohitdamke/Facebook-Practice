@@ -13,10 +13,8 @@ import java.util.UUID
 class AddThreadViewModel : ViewModel() {
 
     private val db = FirebaseDatabase.getInstance()
-    val userRef = db.getReference("threads")
+    private val threadRef = db.getReference("threads")
 
-    private val storageRef = Firebase.storage.reference
-    private val imageRef = storageRef.child("threads/${UUID.randomUUID()}.jpg")
 
     private val _isPosted = MutableLiveData<Boolean>()
     val isPosted: LiveData<Boolean> = _isPosted
@@ -25,33 +23,50 @@ class AddThreadViewModel : ViewModel() {
     fun saveImage(
         thread: String, userId: String, imageUri: Uri
     ) {
+        val storyKey = threadRef.push().key ?: return
+
+        val storageRef = Firebase.storage.reference
+        val imageRef = storageRef.child("threads/${storyKey}.jpg")
 
         val uploadTask = imageRef.putFile(imageUri)
         uploadTask.addOnSuccessListener {
             imageRef.downloadUrl.addOnSuccessListener { uri ->
-                saveData(thread = thread, userId = userId, image = uri.toString())
+                saveData(
+                    thread = thread,
+                    userId = userId,
+                    storeKey = storyKey,
+                    image = uri.toString()
+                )
             }
         }
-
-
     }
 
     fun saveData(
-        thread: String, userId: String, image: String
+        thread: String, userId: String, image: String, storeKey: String
     ) {
-
+        val newThreadRef = threadRef.push()
+        val storyKey = newThreadRef.key ?: return
         val threadData = ThreadModel(
             thread = thread,
             image = image,
             userId = userId,
-            timeStamp = System.currentTimeMillis().toString()
+            storeKey = storyKey,
+            timeStamp = System.currentTimeMillis().toString(),
+            likes = emptyMap(),
+            dislikes = emptyMap()
         )
 
-        userRef.child(userRef.push().key!!).setValue(threadData).addOnSuccessListener {
+
+        newThreadRef.setValue(threadData).addOnSuccessListener {
             _isPosted.value = true
         }.addOnFailureListener {
             _isPosted.value = false
         }
+//        threadRef.child(threadRef.push().key!!).setValue(threadData).addOnSuccessListener {
+//            _isPosted.value = true
+//        }.addOnFailureListener {
+//            _isPosted.value = false
+//        }
 
 
     }

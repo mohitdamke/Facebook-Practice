@@ -68,6 +68,8 @@ import com.google.firebase.auth.FirebaseAuth
 fun AddThreads(
     modifier: Modifier = Modifier, navController: NavHostController
 ) {
+
+
     val addThreadViewModel: AddThreadViewModel = viewModel()
     val isPosted by addThreadViewModel.isPosted.observeAsState(false)
 
@@ -149,6 +151,7 @@ fun AddThreads(
                                 addThreadViewModel.saveData(
                                     thread = thread,
                                     userId = FirebaseAuth.getInstance().currentUser!!.uid,
+                                    storeKey = "",
                                     image = ""
                                 )
                             } else {
@@ -157,13 +160,7 @@ fun AddThreads(
                                     userId = FirebaseAuth.getInstance().currentUser!!.uid,
                                     imageUri = imageUri!!
                                 )
-
                             }
-                            Toast.makeText(
-                                context,
-                                "Post have been Successfully Uploaded",
-                                Toast.LENGTH_SHORT
-                            ).show()
                         },
                         colors = ButtonDefaults.buttonColors(Color.Black)
                     ) {
