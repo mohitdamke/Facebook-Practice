@@ -131,9 +131,16 @@ fun ThreadItem(
                 contentDescription = null,
                 modifier = modifier
                     .size(30.dp)
-                    .clickable { })
+                    .clickable {
+                        navController.navigate(
+                            Routes.Comments.routes.replace(
+                                "{data}",
+                                thread.storeKey ?: ""
+                            )
+                        )
+                    })
             Spacer(modifier = modifier.padding(start = 2.dp))
-            Text(text = "2 Comments")
+            Text(text = "${thread.comments.size} Comments")
         }
 
         Divider(modifier = modifier.padding(10.dp))

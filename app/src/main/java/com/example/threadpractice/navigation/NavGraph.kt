@@ -8,6 +8,8 @@ import com.example.threadpractice.screens.AddStory
 import com.example.threadpractice.screens.AddThreads
 import com.example.threadpractice.screens.AllStory
 import com.example.threadpractice.screens.BottomNav
+import com.example.threadpractice.screens.Comments
+import com.example.threadpractice.screens.CommentsScreen
 import com.example.threadpractice.screens.Home
 import com.example.threadpractice.screens.Login
 import com.example.threadpractice.screens.Notification
@@ -66,7 +68,7 @@ fun NavGraph(navController: NavHostController) {
 
         composable(route = Routes.OtherUsers.routes) {
             val data = it.arguments!!.getString("data")
-            OtherUsers(navController = navController, uid =  data!!)
+            OtherUsers(navController = navController, uid = data!!)
         }
         composable(route = Routes.StoryDetail.routes) {
 //            val data = it.arguments!!.getString("data")
@@ -80,6 +82,11 @@ fun NavGraph(navController: NavHostController) {
 
         composable(route = Routes.Setting.routes) {
             Setting(navController = navController)
+        }
+
+        composable(route = Routes.Comments.routes) {
+            val data = it.arguments!!.getString("data")
+            CommentsScreen(navController = navController, threadId = data!!)
         }
 
 

@@ -3,6 +3,7 @@ package com.example.threadpractice.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.threadpractice.model.CommentModel
 import com.example.threadpractice.model.ThreadModel
 import com.example.threadpractice.model.UserModel
 import com.google.firebase.database.DataSnapshot
@@ -69,17 +70,64 @@ class HomeViewModel : ViewModel() {
             })
     }
 
-     fun toggleLike(threadId: String, userId: String) {
+    fun toggleLike(threadId: String, userId: String) {
         val threadRef = FirebaseDatabase.getInstance().getReference("threads").child(threadId)
-        threadRef.child("likes").child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    // User has already liked, remove the like
-                    threadRef.child("likes").child(userId).removeValue()
-                } else {
-                    // User has not liked, add the like
-                    threadRef.child("likes").child(userId).setValue(true)
+        threadRef.child("likes").child(userId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        // User has already liked, remove the like
+                        threadRef.child("likes").child(userId).removeValue()
+                    } else {
+                        // User has not liked, add the like
+                        threadRef.child("likes").child(userId).setValue(true)
+                    }
                 }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Handle error
+                }
+            })
+    }
+
+
+    fun addComment(
+        threadId: String,
+        userId: String,
+        username: String,
+        name: String,
+        commentText: String
+    ) {
+        val threadRef = db.getReference("threads").child(threadId)
+        threadRef.child("comments").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val commentsList = mutableListOf<CommentModel>()
+                snapshot.children.mapNotNullTo(commentsList) { it.getValue(CommentModel::class.java) }
+
+                val newComment = CommentModel(
+                    userId = userId, username = username,
+                    name = name, text = commentText
+                )
+                commentsList.add(newComment)
+
+                threadRef.child("comments").setValue(commentsList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error
+            }
+        })
+    }
+
+
+    fun fetchComments(threadId: String, onResult: (List<CommentModel>) -> Unit) {
+        val threadRef =
+            FirebaseDatabase.getInstance().getReference("threads").child(threadId).child("comments")
+        threadRef.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val comments =
+                    snapshot.children.mapNotNull { it.getValue(CommentModel::class.java) }
+                onResult(comments)
             }
 
             override fun onCancelled(error: DatabaseError) {

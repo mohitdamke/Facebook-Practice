@@ -53,7 +53,7 @@ class AddThreadViewModel : ViewModel() {
             storeKey = storyKey,
             timeStamp = System.currentTimeMillis().toString(),
             likes = emptyMap(),
-            dislikes = emptyMap()
+            comments = emptyList(),
         )
 
 
