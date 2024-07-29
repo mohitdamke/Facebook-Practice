@@ -15,8 +15,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -78,23 +81,21 @@ fun AddThreads(
 
     var thread by rememberSaveable { mutableStateOf("") }
 
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
+//    var imageUri by remember { mutableStateOf<Uri?>(null) }
 
+    var imageUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
 
     LaunchedEffect(isPosted) {
         if (isPosted) {
             thread = ""
-            imageUri = null
+//            imageUri = null
+            imageUris = emptyList()
             Toast.makeText(
                 context,
                 "Post have been Successfully Uploaded",
                 Toast.LENGTH_SHORT
             ).show()
-            navController.navigate(Routes.Home.routes) {
-                popUpTo(Routes.AddThread.routes) {
-                    inclusive = true
-                }
-            }
+            navController.navigateUp()
         }
     }
 
@@ -105,19 +106,27 @@ fun AddThreads(
         android.Manifest.permission.READ_EXTERNAL_STORAGE
     }
 
-    val launcher =
-        rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent()
-        )
-        { uri: Uri? ->
-            imageUri = uri
-        }
+    val imageLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri>? ->
+        imageUris = uris ?: emptyList()
+    }
+
+//    val launcher =
+//        rememberLauncherForActivityResult(
+//            contract = ActivityResultContracts.GetContent()
+//        )
+//        { uri: Uri? ->
+//            imageUri = uri
+//        }
     val permissionLauncher =
         rememberLauncherForActivityResult(
             contract = ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if (isGranted) {
+                imageLauncher.launch("image/*")
             } else {
+                Toast.makeText(context, "Permission denied", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -147,18 +156,21 @@ fun AddThreads(
                 actions = {
                     Button(
                         onClick = {
-                            if (imageUri == null) {
+                            if (imageUris.isEmpty()) {
                                 addThreadViewModel.saveData(
                                     thread = thread,
                                     userId = FirebaseAuth.getInstance().currentUser!!.uid,
                                     storeKey = "",
-                                    image = ""
+                                    images = emptyList(),
+//                                    image = ""
                                 )
                             } else {
-                                addThreadViewModel.saveImage(
+                                addThreadViewModel.saveImages(
                                     thread = thread,
                                     userId = FirebaseAuth.getInstance().currentUser!!.uid,
-                                    imageUri = imageUri!!
+                                    imageUris = imageUris
+                                    //                                    imageUri = imageUri!!
+
                                 )
                             }
                         },
@@ -209,55 +221,79 @@ fun AddThreads(
                     .fillMaxWidth(),
 
                 )
-
-            Box(
+            LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(30.dp), contentAlignment = Alignment.Center
-
+                    .padding(start = 16.dp, end = 16.dp)
             ) {
-                Image(
-                    painter = if (imageUri != null) rememberAsyncImagePainter(
-                        model = imageUri
-                    )
-                    else
-                        painterResource(id = R.drawable.add),
-                    contentDescription = "Background Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .size(300.dp)
-                        .clip(RectangleShape)
-                        .clickable {
-                            val isGranted = ContextCompat.checkSelfPermission(
-                                context,
-                                permissionToRequest
-                            ) == PackageManager.PERMISSION_GRANTED
 
-                            if (isGranted) {
-                                launcher.launch("image/*")
-                                Log.i("TAG", "image is been loading")
-                            } else {
-                                permissionLauncher.launch(permissionToRequest)
-                                Log.i("TAG", "image is not loading")
 
+                item {
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(30.dp), contentAlignment = Alignment.Center
+
+                    ) {
+                        Image(
+                            painter = if (imageUris.isNotEmpty()) {
+                                rememberAsyncImagePainter(model = imageUris)
+                            } else painterResource(
+                                id = R.drawable.add
+                            ), contentDescription = "Background Image",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .size(300.dp)
+                                .clip(RectangleShape)
+                                .clickable {
+                                    val isGranted = ContextCompat.checkSelfPermission(
+                                        context,
+                                        permissionToRequest
+                                    ) == PackageManager.PERMISSION_GRANTED
+
+                                    if (isGranted) {
+                                        imageLauncher.launch("image/*")
+                                        Log.i("TAG", "image is been loading")
+                                    } else {
+                                        permissionLauncher.launch(permissionToRequest)
+                                        Log.i("TAG", "image is not loading")
+
+                                    }
+                                }
+                        )
+
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Close Icon",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clickable {
+                                    imageUris = emptyList()
+                                }
+                                .padding(top = 14.dp, bottom = 10.dp)
+                                .align(Alignment.TopEnd)
+                        )
+                    }
+                }
+                items(imageUris) { uri ->
+                    Image(
+                        painter = rememberAsyncImagePainter(model = uri),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth()
+                            .size(150.dp)
+                            .clip(RectangleShape)
+                            .clickable {
+                                imageUris = imageUris.filter { it != uri }
                             }
-                        }
-                )
-
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = "Close Icon",
-                    tint = Color.Black,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clickable {
-                            imageUri = null
-                        }
-                        .padding(top = 14.dp, bottom = 10.dp)
-                        .align(Alignment.TopEnd)
-                )
+                    )
+                }
             }
         }
     }
 }
+

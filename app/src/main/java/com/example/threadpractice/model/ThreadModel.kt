@@ -11,7 +11,8 @@ data class CommentModel(
 
 data class ThreadModel(
     val thread : String = "",
-    val image: String = "",
+//    val image: String = "",
+    val images: List<String> = emptyList(), // Changed to List of URLs
     val userId : String = "",
     val storeKey : String = "",
     val timeStamp : String = "",

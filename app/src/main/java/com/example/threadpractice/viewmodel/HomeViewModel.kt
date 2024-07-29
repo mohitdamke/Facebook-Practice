@@ -1,5 +1,8 @@
 package com.example.threadpractice.viewmodel
 
+import android.content.Context
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,8 +14,10 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import javax.inject.Inject
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel (  ): ViewModel() {
+
 
     private val db = FirebaseDatabase.getInstance()
     val thread = db.getReference("threads")
@@ -34,7 +39,6 @@ class HomeViewModel : ViewModel() {
         val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
         fetchSavedThreads(currentUserId)
 
-        toggleSaveThread(currentUserId)
     }
 
     private fun fetchThreadsAndUsers(onResult: (List<Pair<ThreadModel, UserModel>>) -> Unit) {
@@ -147,7 +151,7 @@ class HomeViewModel : ViewModel() {
         })
     }
 
-    fun toggleSaveThread(threadId: String) {
+    fun toggleSaveThread(threadId: String, context: Context) {
         val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
         val userRef = db.getReference("users").child(currentUserId).child("savedThreads")
 
@@ -156,9 +160,20 @@ class HomeViewModel : ViewModel() {
                 if (snapshot.exists()) {
                     // Thread is already saved, unsave it
                     userRef.child(threadId).removeValue()
+                    // Remove threadId from the saved thread IDs list
+                    _savedThreadIds.value = _savedThreadIds.value?.filter { it != threadId }
+                    Toast.makeText(
+                        context                        ,
+                        "Post Has Been Removed from Saved",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
                     // Thread is not saved, save it
                     userRef.child(threadId).setValue(true)
+                    // Add threadId to the saved thread IDs list
+                    _savedThreadIds.value = _savedThreadIds.value?.plus(threadId) ?: listOf(threadId)
+                    Toast.makeText(context, "Post Has Been Saved", Toast.LENGTH_SHORT).show()
+                    
                 }
             }
 
