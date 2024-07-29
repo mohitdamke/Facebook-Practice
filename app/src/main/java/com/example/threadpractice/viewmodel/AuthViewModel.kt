@@ -174,61 +174,6 @@ class AuthViewModel : ViewModel() {
     }
 
 
-    fun updatdeProfile(
-        name: String,
-        bio: String,
-        userName: String,
-        imageUri: Uri?,
-        context: Context
-    ) {
-        val uid = auth.currentUser?.uid ?: return
-
-        val userUpdate = userRef.child(uid)
-
-        // Update profile picture if provided
-        imageUri?.let { uri ->
-            val newImageRef = storageRef.child("users/${UUID.randomUUID()}.jpg")
-            val uploadTask = newImageRef.putFile(uri)
-            uploadTask.addOnSuccessListener {
-                newImageRef.downloadUrl.addOnSuccessListener { newUri ->
-                    val userData = mapOf(
-                        "name" to name,
-                        "bio" to bio,
-                        "userName" to userName,
-                        "imageUrl" to newUri.toString()
-                    )
-                    userUpdate.updateChildren(userData).addOnSuccessListener {
-                        SharedPref.storeData(
-                            name = name,
-                            userName = userName,
-                            email = SharedPref.getEmail(context), // Assuming SharedPref has method to get email
-                            bio = bio,
-                            imageUri = newUri.toString(),
-                            context = context
-                        )
-                    }.addOnFailureListener { _error.postValue(it.message) }
-                }
-            }.addOnFailureListener { _error.postValue(it.message) }
-        } ?: run {
-            // If no new image, just update text fields
-            val userData = mapOf(
-                "name" to name,
-                "bio" to bio,
-                "userName" to userName
-            )
-            userUpdate.updateChildren(userData).addOnSuccessListener {
-                SharedPref.storeData(
-                    name = name,
-                    userName = userName,
-                    email = SharedPref.getEmail(context), // Assuming SharedPref has method to get email
-                    bio = bio,
-                    imageUri = SharedPref.getImageUrl(context), // Assuming SharedPref has method to get image URL
-                    context = context
-                )
-            }.addOnFailureListener { _error.postValue(it.message) }
-        }
-    }
-
     fun updateProfile(
         name: String? = null,
         bio: String? = null,
