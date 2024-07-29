@@ -9,6 +9,7 @@ import com.example.threadpractice.screens.AddThreads
 import com.example.threadpractice.screens.AllStory
 import com.example.threadpractice.screens.BottomNav
 import com.example.threadpractice.screens.CommentsScreen
+import com.example.threadpractice.screens.EditProfile
 import com.example.threadpractice.screens.Home
 import com.example.threadpractice.screens.Login
 import com.example.threadpractice.screens.Notification
@@ -91,6 +92,10 @@ fun NavGraph(navController: NavHostController) {
 
         composable(route = Routes.Saved.routes) {
             Saved(navController = navController)
+        }
+
+        composable(route = Routes.EditProfile.routes) {
+            EditProfile(navController = navController)
         }
 
 

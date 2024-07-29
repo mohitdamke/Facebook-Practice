@@ -31,12 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.example.threadpractice.R
 import com.example.threadpractice.common.ThreadItem
 import com.example.threadpractice.model.UserModel
 import com.example.threadpractice.navigation.Routes
@@ -162,6 +164,14 @@ fun Profile(
 
                             Text(text = "${followingList?.size ?: "0"} Following", fontSize = 18.sp)
                             Spacer(modifier = modifier.padding(top = 8.dp))
+
+                            Button(
+                                onClick = {
+                                    navController.navigate(Routes.EditProfile.routes)
+                                }, modifier = Modifier
+                            ) {
+                                Text(text = stringResource(R.string.edit_profile))
+                            }
                         }
                         Button(
                             onClick = {
