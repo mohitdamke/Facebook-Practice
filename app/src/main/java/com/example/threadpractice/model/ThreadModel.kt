@@ -16,5 +16,6 @@ data class ThreadModel(
     val storeKey : String = "",
     val timeStamp : String = "",
     val likes: Map<String, Boolean> = emptyMap(),  // User IDs and their like status
-    val comments: List<CommentModel> = emptyList()
+    val comments: List<CommentModel> = emptyList(),
+
     )

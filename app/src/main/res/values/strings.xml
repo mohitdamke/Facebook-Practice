@@ -20,4 +20,7 @@
     <string name="share">Share</string>
     <string name="hello">Hello</string>
     <string name="main_screen">Main Screen</string>
+    <string name="setting">Setting</string>
+    <string name="saved">Saved</string>
+    <string name="saved_post">Saved Post</string>
 </resources>

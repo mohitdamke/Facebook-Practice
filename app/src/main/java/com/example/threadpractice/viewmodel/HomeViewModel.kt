@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.example.threadpractice.model.CommentModel
 import com.example.threadpractice.model.ThreadModel
 import com.example.threadpractice.model.UserModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -19,11 +20,21 @@ class HomeViewModel : ViewModel() {
     private var _threadsAndUsers = MutableLiveData<List<Pair<ThreadModel, UserModel>>>()
     val threadsAndUsers: LiveData<List<Pair<ThreadModel, UserModel>>> = _threadsAndUsers
 
+    private var _savedThreads = MutableLiveData<List<ThreadModel>>()
+    val savedThreads: LiveData<List<ThreadModel>> = _savedThreads
+
+    private val _savedThreadIds = MutableLiveData<List<String>>()
+    val savedThreadIds: LiveData<List<String>> = _savedThreadIds
+
 
     init {
         fetchThreadsAndUsers {
             _threadsAndUsers.value = it
         }
+        val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+        fetchSavedThreads(currentUserId)
+
+        toggleSaveThread(currentUserId)
     }
 
     private fun fetchThreadsAndUsers(onResult: (List<Pair<ThreadModel, UserModel>>) -> Unit) {
@@ -135,6 +146,80 @@ class HomeViewModel : ViewModel() {
             }
         })
     }
+
+    fun toggleSaveThread(threadId: String) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+        val userRef = db.getReference("users").child(currentUserId).child("savedThreads")
+
+        userRef.child(threadId).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    // Thread is already saved, unsave it
+                    userRef.child(threadId).removeValue()
+                } else {
+                    // Thread is not saved, save it
+                    userRef.child(threadId).setValue(true)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error
+            }
+        })
+    }
+
+    fun fetchSavedThreads(userId: String): LiveData<List<ThreadModel>> {
+        val savedThreadsLiveData = MutableLiveData<List<ThreadModel>>()
+
+        db.getReference("users").child(userId).child("savedThreads")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val threadIds = snapshot.children.mapNotNull { it.key }
+                    fetchThreadsByIds(threadIds) { threads ->
+                        savedThreadsLiveData.value = threads
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Handle error
+                }
+            })
+
+        return savedThreadsLiveData
+    }
+
+    private fun fetchThreadsByIds(threadIds: List<String>, onResult: (List<ThreadModel>) -> Unit) {
+        db.getReference("threads").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val threads = threadIds.mapNotNull { id ->
+                    snapshot.child(id).getValue(ThreadModel::class.java)
+                }
+                onResult(threads)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Handle error
+            }
+        })
+    }
+
+    fun getUserById(userId: String): LiveData<UserModel> {
+        val userLiveData = MutableLiveData<UserModel>()
+        db.getReference("users").child(userId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val user = snapshot.getValue(UserModel::class.java)
+                    userLiveData.value = user?: UserModel()
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    // Handle error
+                }
+            })
+        return userLiveData
+    }
+
+
 
 
 }

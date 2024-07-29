@@ -60,6 +60,7 @@ fun Profile(
     val userViewModel: UserViewModel = viewModel()
     val threads by userViewModel.threads.observeAsState(null)
 
+
     val followerList by userViewModel.followerList.observeAsState(null)
     val followingList by userViewModel.followingList.observeAsState(null)
     val scope = rememberCoroutineScope()
@@ -71,14 +72,30 @@ fun Profile(
     if (FirebaseAuth.getInstance().currentUser != null)
         currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
 
+
     if (currentUserId != "") {
         LaunchedEffect(key1 = currentUserId) {
             userViewModel.getFollowers(currentUserId)
             userViewModel.getFollowing(currentUserId)
             userViewModel.fetchThreads(currentUserId)
+            homeViewModel.fetchSavedThreads(userId = currentUserId)
         }
     }
+
+
     val currentUser = FirebaseAuth.getInstance().currentUser?.uid
+
+    val savedThreadIds by homeViewModel.savedThreadIds.observeAsState(emptyList())
+    val threadsToDisplay =
+        threads!!.filter { it.userId == currentUserId } // Filter for uploaded threads
+    val savedThreadsToDisplay =
+        threadsToDisplay.filter { savedThreadIds.contains(it.userId) } // Filter for saved threads
+    val unsavedThreadsToDisplay =
+        threadsToDisplay.filter { !savedThreadIds.contains(it.userId) } // Filter for unsaved threads
+
+
+
+
     LaunchedEffect(currentUser) {
         Log.d("TAG currentUser", "Current user Logout: STARTS " + currentUser.toString())
         if (currentUser == null) {
@@ -129,6 +146,10 @@ fun Profile(
                             Text(text = "Name ${user.name}", fontSize = 26.sp)
                             Spacer(modifier = modifier.padding(4.dp))
                             Text(text = "@${user.userName}", fontSize = 16.sp)
+                            Text(
+                                text = "Total Post Count ${threadsToDisplay.size}",
+                                fontSize = 16.sp
+                            )
                             Spacer(modifier = modifier.padding(4.dp))
                             Text(
                                 text = user.bio,
@@ -188,19 +209,18 @@ fun Profile(
 
                 }
             }
-            item {
-                this@LazyColumn.items(
-                    threads ?: emptyList()
-                ) { pair ->
-                    ThreadItem(
-                        thread = pair,
-                        users = user,
-                        navController = navController,
-                        userId = SharedPref.getUserName(context),
-                    )
-                }
+
+            items(savedThreadsToDisplay + unsavedThreadsToDisplay) { thread ->
+                ThreadItem(
+                    thread = thread,
+                    users = user,
+                    navController = navController,
+                    userId = SharedPref.getUserName(context)
+                )
             }
         }
+
+
     }
 
     LaunchedEffect(key1 = firebaseUser) {

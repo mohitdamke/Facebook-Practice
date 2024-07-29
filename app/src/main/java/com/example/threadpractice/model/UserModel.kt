@@ -7,5 +7,6 @@ data class UserModel(
     val bio: String = "",
     val userName: String = "",
     val imageUrl: String = "",
-    val uid: String = ""
+    val uid: String = "",
+    val savedThreads: Map<String, Boolean> = emptyMap()  // Map of thread IDs to save status
 )

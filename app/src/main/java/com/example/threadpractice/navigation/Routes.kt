@@ -16,6 +16,7 @@ sealed class Routes(val routes: String) {
     object AllStory : Routes("all_story/{all_story}")
     object Setting : Routes("setting")
     object Comments : Routes("comments/{data}")
+    object Saved : Routes("saved")
 
 
 }

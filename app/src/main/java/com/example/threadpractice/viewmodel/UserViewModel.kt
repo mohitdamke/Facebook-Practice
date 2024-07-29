@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.threadpractice.model.StoryModel
 import com.example.threadpractice.model.ThreadModel
 import com.example.threadpractice.model.UserModel
@@ -126,21 +127,19 @@ class UserViewModel : ViewModel() {
         })
     }
 
+
     fun fetchThreads(uid: String) {
-        threadRef.orderByChild("userId").equalTo(uid)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val threadList = snapshot.children.mapNotNull {
-                        it.getValue(ThreadModel::class.java)
-                    }
-                    _threads.postValue(threadList)
+        threadRef.orderByChild("userId").equalTo(uid).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val threadList = snapshot.children.mapNotNull {
+                    it.getValue(ThreadModel::class.java)
                 }
+                _threads.postValue(threadList)
+            }
 
-                override fun onCancelled(error: DatabaseError) {
-                }
-
-
-            })
+            override fun onCancelled(error: DatabaseError) {
+            }
+        })
     }
 
     fun fetchStory(uid: String) {

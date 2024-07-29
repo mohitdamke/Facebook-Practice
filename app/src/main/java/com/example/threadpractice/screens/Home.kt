@@ -68,11 +68,16 @@ fun Home(
 
     val threadAndUsers by homeViewModel.threadsAndUsers.observeAsState(null)
     val storyAndUsers by storyViewModel.storyAndUsers.observeAsState(null)
+
+    val savedThreads by homeViewModel.savedThreads.observeAsState(emptyList())
+
     LaunchedEffect(Unit) {
 
         searchViewModel.fetchUsersExcludingCurrentUser(currentUserId)
         userViewModel.fetchStory(currentUserId)
-
+        userViewModel.fetchThreads(uid = userId)
+        userViewModel.fetchThreads(uid = currentUserId)
+        homeViewModel.fetchSavedThreads(currentUserId)
     }
     Column(
         modifier = modifier
@@ -158,7 +163,7 @@ fun Home(
                     thread = pairs.first,
                     users = pairs.second,
                     navController = navController,
-                    userId = userId
+                    userId = userId,
                 )
 
 

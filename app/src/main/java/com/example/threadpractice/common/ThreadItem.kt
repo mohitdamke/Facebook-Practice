@@ -12,7 +12,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.HeartBroken
+import androidx.compose.material.icons.filled.SaveAs
 import androidx.compose.material.icons.outlined.ModeComment
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -49,6 +51,8 @@ fun ThreadItem(
 
 
     val isLiked = thread.likes.containsKey(currentUserId)
+    val isSaved = users.savedThreads.containsKey(thread.storeKey)
+
 
     Column(
         modifier = modifier
@@ -141,6 +145,19 @@ fun ThreadItem(
                     })
             Spacer(modifier = modifier.padding(start = 2.dp))
             Text(text = "${thread.comments.size} Comments")
+            Spacer(modifier = modifier.padding(start = 10.dp))
+            Icon(
+                imageVector = if (isSaved) {
+                    Icons.Outlined.Save
+                } else Icons.Filled.SaveAs,
+                contentDescription = null,
+                modifier = modifier.clickable {
+                    homeViewModel.toggleSaveThread(
+                        threadId = thread.storeKey ?: "",
+                    )
+                })
+            Spacer(modifier = modifier.padding(start = 2.dp))
+            Text(text = if (isSaved) "Saved" else "Save")
         }
 
         Divider(modifier = modifier.padding(10.dp))

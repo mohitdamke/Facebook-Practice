@@ -34,6 +34,7 @@ import com.example.threadpractice.common.ThreadItem
 import com.example.threadpractice.navigation.Routes
 import com.example.threadpractice.util.SharedPref
 import com.example.threadpractice.viewmodel.AuthViewModel
+import com.example.threadpractice.viewmodel.HomeViewModel
 import com.example.threadpractice.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -55,7 +56,7 @@ fun OtherUsers(
     val firebaseUser by authViewModel.firebaseUser.observeAsState(null)
 
     val userViewModel: UserViewModel = viewModel()
-
+    val homeViewModel: HomeViewModel = viewModel()
     val threads by userViewModel.threads.observeAsState(null)
     val story by userViewModel.story.observeAsState(null)
     val users by userViewModel.users.observeAsState(null)
@@ -168,19 +169,38 @@ fun OtherUsers(
 
             }
             if (threads != null && users != null) {
-                item {
-                    this@LazyColumn.items(
-                        threads ?: emptyList()
-                    ) { pair ->
-                        ThreadItem(
-                            thread = pair,
-                            users = users!!,
-                            navController = navController,
-                            userId = SharedPref.getUserName(context),
-                        )
-                    }
+                this@LazyColumn.items(
+                    threads ?: emptyList()
+                ) { thread ->
+                    val isSaved = false // Replace with logic to check if the thread is saved
+                    // Assuming you have a list of saved thread IDs
+                    ThreadItem(
+                        thread = thread,
+                        users = users!!,
+                        navController = navController,
+                        userId = SharedPref.getUserName(context),
+
+                    )
                 }
             }
+
+//            }        if (threads != null && users != null) {
+//                item {
+//                    this@LazyColumn.items(
+//                        threads ?: emptyList()
+//                    ) { pair ->
+//                        val isSaved = thread.id in savedThreadIds // Assuming you have a list of saved thread IDs
+//                        ThreadItem(
+//                            thread = pair,
+//                            users = users!!,
+//                            navController = navController,
+//                            userId = SharedPref.getUserName(context),
+//                            onSaveClick = ,
+//                            isSaved =
+//                        )
+//                    }
+//                }
+//            }
         }
     }
 
