@@ -107,5 +107,5 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.7.0-beta05")
 
 
-
+    implementation("com.google.ai.client.generativeai:generativeai:0.1.2")
 }

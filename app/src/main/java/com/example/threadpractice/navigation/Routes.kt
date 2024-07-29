@@ -18,6 +18,7 @@ sealed class Routes(val routes: String) {
     object Comments : Routes("comments/{data}")
     object Saved : Routes("saved")
     object EditProfile : Routes("edit_profile")
+    object ChatGemini : Routes("chat_gemini")
 
 
 

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.threadpractice.geminiAi.presentation.ChatScreen
 import com.example.threadpractice.screens.AddStory
 import com.example.threadpractice.screens.AddThreads
 import com.example.threadpractice.screens.AllStory
@@ -96,6 +97,10 @@ fun NavGraph(navController: NavHostController) {
 
         composable(route = Routes.EditProfile.routes) {
             EditProfile(navController = navController)
+        }
+
+        composable(route = Routes.ChatGemini.routes) {
+            ChatScreen(navController = navController)
         }
 
 
