@@ -90,14 +90,14 @@ fun ChatScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
-        }
-        permissionLauncher.launch(permission)
-    }
+//    LaunchedEffect(Unit) {
+//        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            Manifest.permission.READ_MEDIA_IMAGES
+//        } else {
+//            Manifest.permission.READ_EXTERNAL_STORAGE
+//        }
+//        permissionLauncher.launch(permission)
+//    }
 
 
 
@@ -105,8 +105,7 @@ fun ChatScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = paddingValues.calculateTopPadding())
-            .padding(bottom = 10.dp),
-        verticalArrangement = Arrangement.Bottom
+            .padding(bottom = 10.dp), verticalArrangement = Arrangement.Bottom
     ) {
 
         LazyColumn(
@@ -151,8 +150,14 @@ fun ChatScreen(
                     modifier = Modifier
                         .size(40.dp)
                         .clickable {
-                            imagePickerLauncher.launch("image/*")
-                        },
+                            val permission =
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    Manifest.permission.READ_MEDIA_IMAGES
+                                } else {
+                                    Manifest.permission.READ_EXTERNAL_STORAGE
+                                }
+                            permissionLauncher.launch(permission)
+                                   },
                     imageVector = Icons.Rounded.AddPhotoAlternate,
                     contentDescription = "Add Photo",
                     tint = MaterialTheme.colorScheme.primary
@@ -161,17 +166,11 @@ fun ChatScreen(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            TextField(
-                modifier = Modifier
-                    .weight(1f),
-                value = chatState.prompt,
-                onValueChange = {
-                    chaViewModel.onEvent(ChatUiEvent.UpdatePrompt(it))
-                },
-                placeholder = {
-                    Text(text = "Type a prompt")
-                }
-            )
+            TextField(modifier = Modifier.weight(1f), value = chatState.prompt, onValueChange = {
+                chaViewModel.onEvent(ChatUiEvent.UpdatePrompt(it))
+            }, placeholder = {
+                Text(text = "Type a prompt")
+            })
 
             Spacer(modifier = Modifier.width(8.dp))
 
@@ -251,10 +250,7 @@ private fun getBitmap(): Bitmap? {
     val uri = uriState.collectAsState().value
 
     val imageState: AsyncImagePainter.State = rememberAsyncImagePainter(
-        model = ImageRequest.Builder(LocalContext.current)
-            .data(uri)
-            .size(20)
-            .build()
+        model = ImageRequest.Builder(LocalContext.current).data(uri).size(20).build()
     ).state
 
     if (imageState is AsyncImagePainter.State.Success) {
