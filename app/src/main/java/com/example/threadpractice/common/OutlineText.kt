@@ -36,7 +36,7 @@ fun OutlineText(
     label: String
 ) {
     OutlinedTextField(
-        value = value,
+        value = value.trim(),
         onValueChange = { onValueChange(it) },
         singleLine = true
         ,leadingIcon = {

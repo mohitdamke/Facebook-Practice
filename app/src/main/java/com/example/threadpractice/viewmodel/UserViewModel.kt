@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.threadpractice.model.ChatModel
 import com.example.threadpractice.model.StoryModel
 import com.example.threadpractice.model.ThreadModel
 import com.example.threadpractice.model.UserModel
@@ -27,9 +28,14 @@ import java.util.concurrent.TimeUnit
 class UserViewModel : ViewModel() {
 
     private val db = FirebaseDatabase.getInstance()
-    val threadRef = db.getReference("threads")
+    private val threadRef = db.getReference("threads")
     val storyRef = db.getReference("story")
-    val userRef = db.getReference("users")
+    private val userRef = db.getReference("users")
+
+    private val _chatMessages = MutableLiveData<List<ChatModel>>()
+    val chatMessages: LiveData<List<ChatModel>> get() = _chatMessages
+
+    val chatRef = db.getReference("chats")
 
     private val _threads = MutableLiveData(listOf<ThreadModel>())
     val threads: LiveData<List<ThreadModel>> get() = _threads
@@ -234,6 +240,63 @@ class UserViewModel : ViewModel() {
             }
     }
 
+    fun fetchChatMessages(chatId: String) {
+        val storyKey = chatRef.push().key ?: return
+
+        chatRef.child(chatId).orderByChild("timestamp").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val chatList = snapshot.children.mapNotNull {
+                    it.getValue(ChatModel::class.java)
+                }
+                _chatMessages.postValue(chatList)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("Chat", "Failed to fetch chat messages: ${error.message}")
+            }
+        })
+    }
+
+    // Send a chat message
+    fun sendMessage(chatId: String, message: ChatModel) {
+        val messageWithStoreKey = message.copy(storeKey = chatRef.push().key ?: "")
+        chatRef.child(chatId).push().setValue(messageWithStoreKey).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d("Chat", "Message sent successfully")
+            } else {
+                Log.d("Chat", "Failed to send message: ${task.exception?.message}")
+            }
+        }
+    }
+
+    // Delete a chat message
+    fun deleteMessage(chatId: String, storeKey: String) {
+        chatRef.child(chatId).orderByChild("storeKey").equalTo(storeKey).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    // Iterate through all matching messages with the given storeKey
+                    snapshot.children.forEach { messageSnapshot ->
+                        val messageId = messageSnapshot.key
+                        if (messageId != null) {
+                            chatRef.child(chatId).child(messageId).removeValue().addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.d("Chat", "Message with storeKey $storeKey deleted successfully")
+                                } else {
+                                    Log.d("Chat", "Failed to delete message with storeKey $storeKey: ${task.exception?.message}")
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Log.d("Chat", "No message found with storeKey $storeKey")
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.d("Chat", "Failed to delete message with storeKey $storeKey: ${error.message}")
+            }
+        })
+    }
 
 }
 

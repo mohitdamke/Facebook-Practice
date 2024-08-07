@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,9 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.threadpractice.common.OutlineText
-import com.example.threadpractice.common.ThreadItem
-import com.example.threadpractice.common.UserItem
-import com.example.threadpractice.viewmodel.HomeViewModel
+import com.example.threadpractice.common.SearchUserItem
 import com.example.threadpractice.viewmodel.SearchViewModel
 import com.google.firebase.auth.FirebaseAuth
 
@@ -58,7 +55,7 @@ fun Search(modifier: Modifier = Modifier, navController: NavHostController) {
                 val filterItems = usersList!!.filter { it.name.contains(search, ignoreCase = true) }
 
                 items(filterItems) { pairs ->
-                    UserItem(
+                    SearchUserItem(
                         users = pairs,
                         navHostController = navController,
                     )

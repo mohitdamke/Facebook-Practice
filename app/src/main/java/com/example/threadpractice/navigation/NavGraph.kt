@@ -4,16 +4,17 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.threadpractice.geminiAi.presentation.ChatScreen
+import com.example.threadpractice.geminiAi.presentation.AiChatScreen
 import com.example.threadpractice.screens.AddStory
 import com.example.threadpractice.screens.AddThreads
+import com.example.threadpractice.screens.AllChatScreen
 import com.example.threadpractice.screens.AllStory
 import com.example.threadpractice.screens.BottomNav
+import com.example.threadpractice.screens.ChatPeople
 import com.example.threadpractice.screens.CommentsScreen
 import com.example.threadpractice.screens.EditProfile
 import com.example.threadpractice.screens.Home
 import com.example.threadpractice.screens.Login
-import com.example.threadpractice.screens.Notification
 import com.example.threadpractice.screens.OtherUsers
 import com.example.threadpractice.screens.Profile
 import com.example.threadpractice.screens.Register
@@ -41,10 +42,6 @@ fun NavGraph(navController: NavHostController) {
 
         composable(route = Routes.Register.routes) {
             Register(navController = navController)
-        }
-
-        composable(route = Routes.Notification.routes) {
-            Notification(navController = navController)
         }
 
         composable(route = Routes.Search.routes) {
@@ -100,7 +97,16 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable(route = Routes.ChatGemini.routes) {
-            ChatScreen(navController = navController)
+            AiChatScreen(navController = navController)
+        }
+
+        composable(route = Routes.ChatPeople.routes) {
+            val data = it.arguments!!.getString("data")
+            ChatPeople(navController = navController, uid = data!!)
+        }
+
+        composable(route = Routes.AllChat.routes) {
+            AllChatScreen(navController = navController)
         }
 
 

@@ -2,7 +2,6 @@ package com.example.threadpractice.navigation
 
 sealed class Routes(val routes: String) {
     object Home : Routes("home")
-    object Notification : Routes("notification")
     object Profile : Routes("profile")
     object Search : Routes("search")
     object Splash : Routes("splash")
@@ -19,6 +18,8 @@ sealed class Routes(val routes: String) {
     object Saved : Routes("saved")
     object EditProfile : Routes("edit_profile")
     object ChatGemini : Routes("chat_gemini")
+    object AllChat : Routes("all_chat")
+    object ChatPeople : Routes("chat_people/{data}")
 
 
 

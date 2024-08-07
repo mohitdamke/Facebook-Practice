@@ -37,10 +37,6 @@ fun BottomNav(navController: NavHostController) {
                 Home(navController = navController)
             }
 
-            composable(route = Routes.Notification.routes) {
-                Notification(navController = navController)
-            }
-
             composable(route = Routes.Search.routes) {
                 Search(navController = navController)
             }
@@ -68,11 +64,8 @@ fun MyBottomBar(navController1: NavHostController) {
         BottomNavItem("Home", Routes.Home.routes, Icons.Default.Home),
         BottomNavItem("Search", Routes.Search.routes, Icons.Default.Search),
         BottomNavItem("AddThread", Routes.AddThread.routes, Icons.Default.AddCircle),
-        BottomNavItem("Notification", Routes.Notification.routes, Icons.Default.Notifications),
         BottomNavItem("Profile", Routes.Profile.routes, Icons.Default.Person),
-
-
-        )
+    )
 
     BottomAppBar {
         list.forEach {

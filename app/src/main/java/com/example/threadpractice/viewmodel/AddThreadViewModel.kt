@@ -9,7 +9,6 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import java.util.UUID
 
 class AddThreadViewModel : ViewModel() {
 

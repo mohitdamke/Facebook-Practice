@@ -21,7 +21,7 @@ import com.example.threadpractice.model.UserModel
 import com.example.threadpractice.navigation.Routes
 
 @Composable
-fun UserItem(
+fun SearchUserItem(
     modifier: Modifier = Modifier,
     users: UserModel,
     navHostController: NavHostController,

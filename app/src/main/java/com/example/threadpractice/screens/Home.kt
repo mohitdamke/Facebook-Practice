@@ -17,8 +17,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.rounded.ChatBubble
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,9 +35,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
@@ -47,6 +51,7 @@ import com.example.threadpractice.viewmodel.StoryViewModel
 import com.example.threadpractice.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
     modifier: Modifier = Modifier,
@@ -79,95 +84,120 @@ fun Home(
         userViewModel.fetchThreads(uid = currentUserId)
         homeViewModel.fetchSavedThreads(currentUserId)
     }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(6.dp)
-    ) {
-        Text(text = "Home Page", fontSize = 26.sp, fontWeight = FontWeight.SemiBold)
 
-        Row(
-            modifier = modifier.padding(4.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+    Scaffold(modifier = modifier, topBar = {
+        SmallTopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.primary,
+            ),
+            title = {
+                Text("Home")
+            },
+            actions = {
+                Icon(
+                    imageVector = Icons.Rounded.ChatBubble,
+                    contentDescription = null,
+                    modifier = modifier.clickable {navController.navigate(Routes.AllChat.routes)})
+            },
+            scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+        )
+    }) {
+
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(it)
+                .padding(6.dp)
         ) {
+            Row(
+                modifier = modifier.padding(4.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
 
-            LazyRow(modifier = Modifier.padding(start = 4.dp)) {
-                item {
-                    Box() {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                model = SharedPref.getImageUrl(
-                                    context
-                                )
-                            ),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(100.dp)
-                                .clickable {
-                                    if (storyAndUsers != null && storyAndUsers!!.isNotEmpty()) {
-                                        val routes =
-                                            Routes.AllStory.routes.replace(
-                                                oldValue = "{all_story}",
-                                                newValue = currentUserId
-                                            )
-                                        navController.navigate(routes)
-                                    } else {
-                                        navController.navigate(Routes.AddStory.routes)
-                                    }
-                                }
-                                .clip(CircleShape)
-                                .border(width = 2.dp, color = Color.Red, shape = CircleShape),
-                            contentScale = ContentScale.Crop
-                        )
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
-                            contentDescription = null,
-                            modifier = modifier
-                                .clickable {
-                                    navController.navigate(Routes.AddStory.routes) {
-                                        popUpTo(Routes.Home.routes) {
-                                            inclusive = true
+                LazyRow(modifier = Modifier.padding(start = 4.dp)) {
+                    item {
+                        Box() {
+                            Image(
+                                painter = rememberAsyncImagePainter(
+                                    model = SharedPref.getImageUrl(
+                                        context
+                                    )
+                                ),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .clickable {
+                                        if (storyAndUsers != null && storyAndUsers!!.isNotEmpty()) {
+                                            val routes =
+                                                Routes.AllStory.routes.replace(
+                                                    oldValue = "{all_story}",
+                                                    newValue = currentUserId
+                                                )
+                                            navController.navigate(routes)
+                                        } else {
+                                            navController.navigate(Routes.AddStory.routes)
                                         }
                                     }
-                                }
-                                .align(Alignment.BottomEnd)
-                        )
-                    }
-                }
-                item {
-                    Spacer(modifier = modifier.padding(start = 4.dp))
-
-                }
-                item {
-                    if (usersList != null && usersList!!.isNotEmpty()) {
-                        val filterItems =
-                            usersList!!.filter {
-                                it.uid != FirebaseAuth.getInstance().currentUser!!.uid
-                            }
-                        this@LazyRow.items(filterItems) { pairs ->
-                            UsersStoryHomeItem(
-                                users = pairs,
-                                navHostController = navController,
+                                    .clip(CircleShape)
+                                    .border(
+                                        width = 2.dp,
+                                        color = Color.Red,
+                                        shape = CircleShape
+                                    ),
+                                contentScale = ContentScale.Crop
                             )
+                            Icon(
+                                imageVector = Icons.Default.AddCircle,
+                                contentDescription = null,
+                                modifier = modifier
+                                    .clickable {
+                                        navController.navigate(Routes.AddStory.routes) {
+                                            popUpTo(Routes.Home.routes) {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
+                                    .align(Alignment.BottomEnd)
+                            )
+                        }
+                    }
+                    item {
+                        Spacer(modifier = modifier.padding(start = 4.dp))
+
+                    }
+                    item {
+                        if (usersList != null && usersList!!.isNotEmpty()) {
+                            val filterItems =
+                                usersList!!.filter {
+                                    it.uid != FirebaseAuth.getInstance().currentUser!!.uid
+                                }
+                            this@LazyRow.items(filterItems) { pairs ->
+                                UsersStoryHomeItem(
+                                    users = pairs,
+                                    navHostController = navController,
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
 
 
-        LazyColumn(modifier = modifier.padding(2.dp)) {
-            items(threadAndUsers ?: emptyList()) { pairs ->
-                ThreadItem(
-                    thread = pairs.first,
-                    users = pairs.second,
-                    navController = navController,
-                    userId = userId,
-                )
+            LazyColumn(modifier = modifier.padding(2.dp)) {
+                items(threadAndUsers ?: emptyList()) { pairs ->
+                    ThreadItem(
+                        thread = pairs.first,
+                        users = pairs.second,
+                        navController = navController,
+                        userId = userId,
+                    )
 
 
+                }
             }
         }
+
     }
 }
