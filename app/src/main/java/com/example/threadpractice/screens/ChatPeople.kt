@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,6 +57,8 @@ import com.example.threadpractice.viewmodel.AuthViewModel
 import com.example.threadpractice.viewmodel.PeopleChatViewModel
 import com.example.threadpractice.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -222,12 +225,16 @@ fun ChatPeople(
     }
 }
 
-
+private fun formatTimestamp(timestamp: Long): String {
+    val dateFormat = SimpleDateFormat("hh:mm a", Locale.getDefault()) // Adjust format as needed
+    return dateFormat.format(timestamp)
+}
 @Composable
 fun UserMessageItem(message: ChatModel, onDelete: (String) -> Unit) {
+    val formattedTimestamp = formatTimestamp(message.timestamp)
     Column(
         modifier = Modifier
-            .padding(start = 100.dp, bottom = 16.dp)
+            .padding(start = 100.dp, bottom = 2.dp)
             .clickable { onDelete(message.storeKey) }
     ) {
         Text(
@@ -239,14 +246,21 @@ fun UserMessageItem(message: ChatModel, onDelete: (String) -> Unit) {
                 .padding(16.dp),
             color = MaterialTheme.colorScheme.onPrimary
         )
+        Text(text = formattedTimestamp,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+            modifier = Modifier.padding(top = 2.dp, start = 230.dp),
+            textAlign = TextAlign.End)
     }
 }
 
 @Composable
 fun OtherMessageItem(message: ChatModel, onDelete: (String) -> Unit) {
+    val formattedTimestamp = formatTimestamp(message.timestamp)
+
     Column(
         modifier = Modifier
-            .padding(end = 100.dp, bottom = 16.dp)
+            .padding(end = 100.dp, bottom = 2.dp)
             .clickable { onDelete(message.storeKey) }
     ) {
         Text(
@@ -258,5 +272,9 @@ fun OtherMessageItem(message: ChatModel, onDelete: (String) -> Unit) {
                 .padding(16.dp),
             color = MaterialTheme.colorScheme.onSecondary
         )
+        Text(text = formattedTimestamp,
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+            modifier = Modifier.padding(top = 2.dp, start = 230.dp))
     }
 }
