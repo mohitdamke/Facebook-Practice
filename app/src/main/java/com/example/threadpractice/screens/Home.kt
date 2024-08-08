@@ -98,95 +98,97 @@ fun Home(
                 Icon(
                     imageVector = Icons.Rounded.ChatBubble,
                     contentDescription = null,
-                    modifier = modifier.clickable {navController.navigate(Routes.AllChat.routes)})
+                    modifier = modifier.clickable { navController.navigate(Routes.AllChat.routes) })
             },
-            scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+            scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
         )
     }) {
-
-        Column(
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
                 .padding(it)
                 .padding(6.dp)
         ) {
-            Row(
-                modifier = modifier.padding(4.dp),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
 
-                LazyRow(modifier = Modifier.padding(start = 4.dp)) {
-                    item {
-                        Box() {
-                            Image(
-                                painter = rememberAsyncImagePainter(
-                                    model = SharedPref.getImageUrl(
-                                        context
-                                    )
-                                ),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(100.dp)
-                                    .clickable {
-                                        if (storyAndUsers != null && storyAndUsers!!.isNotEmpty()) {
-                                            val routes =
-                                                Routes.AllStory.routes.replace(
-                                                    oldValue = "{all_story}",
-                                                    newValue = currentUserId
-                                                )
-                                            navController.navigate(routes)
-                                        } else {
-                                            navController.navigate(Routes.AddStory.routes)
-                                        }
-                                    }
-                                    .clip(CircleShape)
-                                    .border(
-                                        width = 2.dp,
-                                        color = Color.Red,
-                                        shape = CircleShape
+            item {
+
+
+                Row(
+                    modifier = modifier.padding(4.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    LazyRow(modifier = Modifier.padding(start = 4.dp)) {
+                        item {
+                            Box {
+                                Image(
+                                    painter = rememberAsyncImagePainter(
+                                        model = SharedPref.getImageUrl(
+                                            context
+                                        )
                                     ),
-                                contentScale = ContentScale.Crop
-                            )
-                            Icon(
-                                imageVector = Icons.Default.AddCircle,
-                                contentDescription = null,
-                                modifier = modifier
-                                    .clickable {
-                                        navController.navigate(Routes.AddStory.routes) {
-                                            popUpTo(Routes.Home.routes) {
-                                                inclusive = true
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                        .clickable {
+                                            if (storyAndUsers != null && storyAndUsers!!.isNotEmpty()) {
+                                                val routes =
+                                                    Routes.AllStory.routes.replace(
+                                                        oldValue = "{all_story}",
+                                                        newValue = currentUserId
+                                                    )
+                                                navController.navigate(routes)
+                                            } else {
+                                                navController.navigate(Routes.AddStory.routes)
                                             }
                                         }
-                                    }
-                                    .align(Alignment.BottomEnd)
-                            )
-                        }
-                    }
-                    item {
-                        Spacer(modifier = modifier.padding(start = 4.dp))
-
-                    }
-                    item {
-                        if (usersList != null && usersList!!.isNotEmpty()) {
-                            val filterItems =
-                                usersList!!.filter {
-                                    it.uid != FirebaseAuth.getInstance().currentUser!!.uid
-                                }
-                            this@LazyRow.items(filterItems) { pairs ->
-                                UsersStoryHomeItem(
-                                    users = pairs,
-                                    navHostController = navController,
+                                        .clip(CircleShape)
+                                        .border(
+                                            width = 2.dp,
+                                            color = Color.Red,
+                                            shape = CircleShape
+                                        ),
+                                    contentScale = ContentScale.Crop
                                 )
+                                Icon(
+                                    imageVector = Icons.Default.AddCircle,
+                                    contentDescription = null,
+                                    modifier = modifier
+                                        .clickable {
+                                            navController.navigate(Routes.AddStory.routes) {
+                                                popUpTo(Routes.Home.routes) {
+                                                    inclusive = true
+                                                }
+                                            }
+                                        }
+                                        .align(Alignment.BottomEnd)
+                                )
+                            }
+                        }
+                        item {
+                            Spacer(modifier = modifier.padding(start = 4.dp))
+
+                        }
+                        item {
+                            if (usersList != null && usersList!!.isNotEmpty()) {
+                                val filterItems =
+                                    usersList!!.filter {
+                                        it.uid != FirebaseAuth.getInstance().currentUser!!.uid
+                                    }
+                                this@LazyRow.items(filterItems) { pairs ->
+                                    UsersStoryHomeItem(
+                                        users = pairs,
+                                        navHostController = navController,
+                                    )
+                                }
                             }
                         }
                     }
                 }
-            }
 
 
-            LazyColumn(modifier = modifier.padding(2.dp)) {
-                items(threadAndUsers ?: emptyList()) { pairs ->
+                this@LazyColumn.items(threadAndUsers ?: emptyList()) { pairs ->
                     ThreadItem(
                         thread = pairs.first,
                         users = pairs.second,
@@ -198,6 +200,6 @@ fun Home(
                 }
             }
         }
-
     }
+
 }
